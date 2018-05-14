@@ -1,0 +1,61 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;<span class="fa fa-chevron-left" aria-hidden="true" onclick="history.go(-1)"></span></div>
+    <div class="left">订单详细</div>
+    <div></div>
+</div>
+<div class="orderStatus">
+    <div>{{orderInfo|stateFilter:'orderStatus'}}</div>
+    <div>{{(orderInfo.orderStatus==1||orderInfo.orderStatus==2)?'剩余'+(orderInfo.expdtm|parseIntFilter) +'小时订单到期':''}}</div>
+</div>
+<div class="orderInfo">
+    <div class="cell">
+        <div class="media">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" [src]="orderInfo.doctor.headUrl?baseUrl+orderInfo.doctor.headUrl:'./assets/img/head.png'" alt="{{orderInfo.doctor.userName}}">
+                </a>
+            </div>
+            <div class="media-body">
+                <h3>{{orderInfo.doctor.userName}}
+                    <small>{{orderInfo.doctor.userInfo.userTitleName}}</small>
+                    <small>{{orderInfo.doctor.userHospital.userDepartmentName}}</small>
+                </h3>
+                <p>{{orderInfo.doctor.userHospital.userHospitalName}} </p>
+                <p>{{orderInfo.apply.applyRemark}} </p>
+            </div>
+        </div>
+        <hr>
+        <div class="list_flex">
+            <div>服务类型</div>
+            <div>{{orderInfo.apply.serviceName}}服务</div>
+        </div>
+        <div class="list_flex">
+            <div>实付款</div>
+            <div>{{orderInfo.apply.applyMoney/100}}￥</div>
+        </div>
+        <hr>
+        <div class="order-code">
+            订单编号：{{orderInfo.orderId}}<br> 创建时间：{{(orderInfo.creatDtm*1000)|myDate}}
+        </div>
+    </div>
+    <!-- <button class="btn" (click)="openModal(template)">打开模态框</button> -->
+    <div class="btngrop" *ngIf="(orderInfo.orderStatus==1||orderInfo.orderStatus==2)">
+        <button class="btn" (click)="openModal(template)">取消订单</button>&nbsp;&nbsp;
+        <button class="btn" (click)="goPay()">去支付</button>
+    </div>
+</div>
+
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>
+<template #template tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> 
+        <div class="modal-body alertCofirm">
+        <div class="cont">
+         您确定要取消吗？
+        </div>
+        <div class="btngroup"><button  (click)="modalRef.hide()">取&nbsp;消</button><button (click)="cancelOrder()">确&nbsp;定</button></div>
+        </div>
+  </template>

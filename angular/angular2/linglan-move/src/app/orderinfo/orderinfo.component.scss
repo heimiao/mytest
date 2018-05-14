@@ -1,0 +1,100 @@
+@import "../../sass/mixins";
+@import "../../sass/mixins/button";
+.orderStatus {
+    background: #fff;
+    padding: 1rem 1.7rem 1.7rem 1.7rem;
+    height: 7rem;
+    >div:first-child {
+        color: #4590ec;
+        font-size: 1.8rem;
+    }
+    >div:last-child {
+        color: #333;
+        font-size: 1.4rem;
+    }
+}
+
+.orderInfo {
+    .cell {
+        background: #fff;
+        margin-top: 1.5rem;
+        hr {
+            margin: 0px;
+            margin-left: .7rem;
+        }
+        .media {
+            background: #fff;
+            margin-top: 0px;
+            padding: 1.5rem 0px;
+            padding-left: .7rem;
+            .media-body {
+                >h3 {
+                    font-size: 1.8rem;
+                    color: #000;
+                    small {
+                        color: #666;
+                        margin-left: .5rem;
+                        font-size: 1.4rem;
+                    }
+                }
+                p {
+                    font-size: 1.4rem;
+                    color: #333;
+                    margin: .5rem 0px;
+                    padding-right: .7rem;
+                    &:last-child {
+                        margin-top: 1rem;
+                        font-size: 1.6rem;
+                    }
+                }
+            }
+        }
+        .list_flex {
+            display: flex;
+            height: 4rem;
+            >div {
+                flex: 1;
+                padding: 0px 1.2rem;
+                align-self: center;
+                font-size: 1.4rem;
+            }
+            >div:first-child {
+                text-align: left;
+                color: #333;
+            }
+            >div:last-child {
+                text-align: right;
+                color: #000;
+                font-size: 1.8rem;
+            }
+        }
+        .order-code {
+            color: #666;
+            font-size: 1.4rem;
+            padding: 2.2rem 0 2.2rem .7rem;
+        }
+    }
+    img {
+        max-width: 4.8rem;
+        max-height: 4.8rem;
+        @include radius(50%);
+    }
+    .btngrop {
+        text-align: center;
+        margin-top: 2.7rem;
+        >button:first-child {
+            @include data-btn(35%, 3.8rem, #999);
+            line-height: 0rem;
+            font-size: 1.6rem;
+            float: left;
+            margin-left: 2rem;
+        }
+        >button:last-child {
+            @include data-btn(35%, 3.8rem, #4590ec);
+            line-height: 0rem;
+            font-size: 1.6rem;
+            float: right;
+            margin-right: 2rem;
+        }
+    }
+}

@@ -1,0 +1,124 @@
+/* You can add global styles to this file, and also import other style files */
+
+html {
+    font-size: 62.5%;
+    font-family: "微软雅黑";
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: #f2f2f2;
+}
+
+@import "./sass/mixins";
+@import "./sass/mixins/button";
+.navTitle {
+    display: flex;
+    align-items: center;
+    height: 4.5rem;
+    background: #4590ec;
+    >div {
+        align-self: center;
+        align-content: center;
+        color: #fff;
+        font-size: 1.8rem;
+        flex: 2;
+        text-align: center;
+        &:first-child {
+            flex: 1;
+            text-align: left;
+        }
+        &:last-child {
+            flex: 1;
+            text-align: right;
+        }
+    }
+    .guanzhu {
+        padding-right: 1rem;
+        font-size: 1.4rem;
+    }
+}
+
+.btn_info {
+    @include data-btn(100%, auto, #4590ed);
+    @include radius(.5rem);
+    font-size: 1.8rem;
+}
+
+.modal-content {
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    @include radius(1.5rem);
+    overflow: hidden;
+}
+
+//弹窗
+.alertContainer {
+    .alert {
+        position: fixed;
+        z-index: 10;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        background: transparent;
+        .cont {
+            background: #000;
+            border: 0px;
+            padding: 15px;
+            @include opacity(60);
+            text-align: center;
+            width: 60%;
+            margin: 50% auto;
+            color: #fff;
+            font-size: 1.4rem;
+            margin-bottom: 0rem;
+            @include radius(.5rem);
+        }
+    }
+}
+
+.alertCofirm {
+    background: #fff;
+    width: 100%;
+    position: relative;
+    padding: 0px;
+    min-height: 16rem;
+    .cont {
+        padding: 3rem 1.5rem 6rem 1.5rem;
+        height: 100%;
+        font-size: 1.6rem;
+        vertical-align: middle;
+        text-align: center;
+    }
+    .btngroup {
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        // display: flex;
+        text-align: center;
+        font-size: 0px;
+        button {
+            // flex: 1;
+            margin: 0px;
+            font-size: 1.7rem;
+            @include data-btn(50%, 4.6rem, #fff, #000);
+            border: 0px;
+            width: 49.5%;
+            border-top: 1px solid #eaeaea;
+            &:first-child {
+                border-right: 1px solid #eaeaea;
+            }
+            @include radius(0rem);
+            outline: none;
+        }
+    }
+}
+
+.modal-dialog {
+    @include radius(2rem);
+    margin-top: 50%;
+}

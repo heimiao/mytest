@@ -1,0 +1,33 @@
+@import "variables";
+//导入组件库
+@import "mixins";
+//重置css样式保证浏览器的统一性
+@import "normalize";
+@import "print";
+//@import "glyphicons";
+
+//导入mixin方法比如按钮
+.btn_default{
+    @include data-btn();
+}
+.btn_error{
+     @include data-btn(auto,auto,#f3856c);
+     @include radius(10px);
+}
+.btn_success{
+    @include data-btn(auto,auto,#00703e);
+    @include radius(15px);
+}
+.btn_warning{
+     @include data-btn(auto,auto,#e9e335,#fff);
+    @include radius(0px);
+}
+.btn_info{
+    @include data-btn(auto,auto,#21a0e8);
+    @include radius(0px);
+}
+
+.test_img{
+    background:url("../images/test.jpg");   
+}
+

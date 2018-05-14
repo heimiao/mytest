@@ -1,0 +1,36 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;<span class="fa fa-chevron-left" aria-hidden="true" onclick="history.go(-1)"></span></div>
+    <div class="left">选择服务类型</div>
+    <div></div>
+</div>
+
+<div class="serviceType">
+    <div class="pricelist" *ngFor="let item of ServiceTypeAry">
+        <div class="list_flex">
+            <!-- <div>单次咨询<small>{{item.name}}</small></div> -->
+            <div>{{item.name}}</div>
+            <div class="{{item.status?'ablePrice':'disablePrice'}}">
+                <label for="{{item.code}}">{{item.value/100}}元
+                     <input id="{{item.code}}" type="radio" name="price" class="myradio" value="{{item.code}}" [(ngModel)]="sendParam.serviceCode" [disabled]="item.status==0"> </label>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+
+
+<div class="opration">
+    <div class="callback">
+        <textarea name="" [(ngModel)]="sendParam.applyRemark"></textarea>
+    </div>
+    <div class="waring">(您可以补充病情症状描述，以及想要获得的帮助等内容)</div>
+    <button class="btn openserver" (click)="applyService()">支付</button>
+    <div class="waring">如果医生未接受您的咨询，费用会自动退还</div>
+</div>
+
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>

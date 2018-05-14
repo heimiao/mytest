@@ -1,0 +1,37 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;<span class="fa fa-chevron-left" aria-hidden="true" onclick="history.go(-1)"></span></div>
+    <div class="left">我的订单</div>
+    <div></div>
+</div>
+<div class="orderlist">
+    <div class="cell" *ngFor="let item of orderList">
+        <a href="../orderinfo/{{item.orderId}}">
+            <div class="list_title">
+                <div>{{item.apply.serviceName}}服务</div>
+                <div>{{item|stateFilter:'orderStatus'}}</div>
+            </div>
+            <hr>
+            <div class="media">
+                <div class="media-left">
+                    <a href="#">
+                        <img class="media-object" [src]="item.doctor.headUrl?baseUrl+item.doctor.headUrl:'./assets/img/head.png'" alt="...">
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h3>{{item.doctor.userName}}
+                        <small>{{item.doctor.userInfo.userTitleName}}</small>
+                        <small>{{item.doctor.userHospital.userDepartmentName}}</small>
+                        <span>{{item.apply.applyMoney/100}}￥</span>
+                    </h3>
+                    <p>{{item.doctor.userHospital.userHospitalName}} </p>
+                    <p>{{item.apply.applyRemark}} </p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>

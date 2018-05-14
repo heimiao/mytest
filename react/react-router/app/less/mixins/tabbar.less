@@ -1,0 +1,163 @@
+/*///默认属性 
+    time:2016-07-11
+    autor:maweichao
+    desc:导航用到的属性值有， 
+    @border-radius: 0px;                   圆角
+    @background: #fff;                      背景色
+    @color: #80868A;                        字体颜色
+    @font-size: 16px;                       字体大小
+    @width: 100%;                           宽度
+    @height: auto;                          高度
+    @line-height: auto;                     垂直高度
+    @hover-bg-color: #0096ff;               按下背景颜色
+    @hover-text-color: #fff;                按下字体颜色
+    @hover-border-direction: none;           bottom|top|none 解释：按下导航底部或者头部的横线
+    @border:none;                            bottom|top|none 解释：头部或者底部边线
+    @is-shadow: true;                        true|false 解释：s是否阴影
+    @border-color: #0096ff;                  边框颜色
+    @is-columnRule: false;                  是否有中划线
+    @is-auto:false                          自动平分容器空白处(一旦为true就不能将他设置为滚动状态了)
+ */  
+
+.tab_Bar( 
+@border-radius: 0px;
+@background:#f3f3f3;
+@color: #80868A;
+@font-size: 16px;
+@width: 100%;
+@height: auto;
+@line-height: auto;
+@hover-bg-color:skyblue;
+@hover-text-color: #0195FF;
+@hover-border-direction: bottom;
+@border: top;
+@is-shadow: flase;
+@border-color: #0096ff;
+@is-columnRule: false;
+) {
+    @box-shadow: 0px -2px 15px 1px #ddd;
+    @border-top: 1px solid @border-color;
+    @border-bottom: 1px solid @border-color;
+    @column-rule: 1px solid @color;
+    @hover-border: 1px solid @border-color;
+    @is-auto:true;
+    width: @width;
+    //padding: 0px (@grid-gutter-width/2);
+    text-align: center;
+    overflow: hidden;
+    background:#fff;
+    bottom: 0px;
+    height: @height;
+    & when(@is-shadow) {
+        .box-shadow(@box-shadow);
+    }
+    .tabbar {
+        & when(@border=top) {
+            border-top: @border-top;
+        }
+        & when (@border=bottom) {
+            border-bottom: @border-bottom;
+        }
+        border: @border;
+        position: relative;
+        background: @background;
+        height: 100%;
+        line-height: @line-height;
+        display:table;
+        & when(@is-auto = true) {
+            display: -webkit-flex;
+            /*display: -webkit-box;
+            display: box;*/
+            display:flex;
+        }
+        table-layout: fixed;
+        white-space: nowrap;
+        width:auto;
+        .ui-nav-item {
+            position: relative;
+            padding:3px 15px;
+            & when(@is-auto =true) {
+                padding:3px 0px;
+                flex:1;
+                -webkit-flex:1;
+            }
+            background: @background;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+            -webkit-box-align: center;
+            -webkit-box-pack: center;
+            .ui-nav-cont {
+                display: block;
+                position: relative;
+                 color:@color;
+                font-size: @font-size;
+                & when (@is-columnRule) {
+                    &:after {
+                        width: 1px;
+                        content: "|";
+                        display: table;
+                        position: absolute;
+                         right: -15px;
+                        & when(@is-auto =true) {
+                            right: 0px;
+                        }
+                        top: 0px;
+                        color: @color;
+                        background: @color;
+                    }
+                }
+            }
+            &:hover {
+                .active;
+            }
+            &:last-child {
+                .ui-nav-cont {
+                    &:after {
+                        display: none;
+                    }
+                }
+                border-top-right-radius:@border-radius;
+                border-bottom-right-radius: @border-radius;
+            }
+            &:first-child {
+                border-top-left-radius: @border-radius;
+                border-bottom-left-radius: @border-radius;
+            }
+        }
+        .active {
+            cursor: pointer;
+            background: @hover-bg-color;
+            .ui-nav-cont {
+                color: @hover-text-color;
+            }
+            &:after {
+                border: @hover-border;
+                height: 1px;
+                width: 100%;
+                left: 0px;
+                position: absolute;
+                display: block;
+                .vdct(@hover-border-direction);
+                .vdct(@hover-border-direction) when (@hover-border-direction =top) {
+                    content: "";
+                    top: 0px;
+                    bottom: auto;
+                }
+                .vdct(@hover-border-direction) when (@hover-border-direction =bottom) {
+                    content: "";
+                    bottom: 0px;
+                    top: auto;
+                }
+            }
+        }
+        .btmLine{
+            position:absolute;
+            width:0px;
+            bottom:0px;
+            height:2px;
+            background:@border-color;
+            left:0px;
+        }
+    }
+}

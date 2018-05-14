@@ -1,0 +1,80 @@
+@import "../../sass/mixins";
+@import "../../sass/mixins/button";
+.navTitle {
+    width: 100%;
+    // position: fixed;
+    top: 0px;
+    // overflow: hidden;
+    // z-index: 2;
+}
+
+.searhList {
+    z-index: 1;
+    width: 100%;
+    // height: 100%;
+    // padding-top: 3.5rem;
+    overflow-y: auto;
+    .abcNav {
+        position: fixed;
+        right: 0rem;
+        top: 30%;
+        width: 1.5rem;
+        height: 80%;
+        >a {
+            text-align: center;
+            width: 100%;
+            display: inline-block;
+            color: #666;
+            font-size: 1.3rem;
+        }
+    }
+}
+
+.linglan_list {
+    .letter {
+        color: #666;
+        font-size: 1.4rem;
+        line-height: 2.1rem;
+        background: #e5e5e5;
+        padding-left: .7rem;
+    }
+    a {
+        text-decoration: none;
+    }
+    .media {
+        background: #fff;
+        border-bottom: 1px solid #e5e5e5;
+        margin-top: 0px;
+        padding: 1rem 0px;
+        padding-left: .7rem;
+        .media-left {
+            vertical-align: middle;
+            img {
+                width: 5.1rem;
+                height: 5.1rem;
+                @include radius(50%);
+            }
+        }
+        .media-body {
+            >h3 {
+                margin-top: .8rem;
+                font-size: 1.8rem;
+                color: #000;
+                small {
+                    color: #9ba2a9;
+                    margin-left: .5rem;
+                    font-size: 1.4rem;
+                }
+            }
+            p {
+                font-size: 1.6rem;
+                color: #656565;
+            }
+        }
+    }
+    img {
+        width: 4.9rem;
+        height: 4.9rem;
+        @include radius(50%);
+    }
+}

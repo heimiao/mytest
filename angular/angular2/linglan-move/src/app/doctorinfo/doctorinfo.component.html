@@ -1,0 +1,56 @@
+<div class="navTitle doctorNav">
+    <div class="left">&nbsp;&nbsp;
+        <span *ngIf="isShowCallBack" class="fa fa-chevron-left" onclick="history.go(-1)" aria-hidden="true"></span>
+    </div>
+    <div class="left">医师详情</div>
+    <div class="guanzhu" (click)="sendParam.isFollow?openModal(template):followDoctor()">
+        <div class="btn btn-pre" *ngIf="sendParam.isFollow">已关注</div>
+        <div class="btn" *ngIf="!sendParam.isFollow"><span>关注</span></div>
+    </div>
+</div>
+<div class="doctorInfo">
+    <div class="desc">
+        <dl>
+            <img [src]="doctorInfo.headUrl?baseUrl+doctorInfo.headUrl:'./assets/img/head.png'" alt="">
+            <dt>
+             {{doctorInfo.userName}}&nbsp;<img [src]="doctorInfo.userSex?'./assets/img/boy.png':'./assets/img/girl.png'" alt="">
+           </dt>
+            <dd>
+                <div>{{doctorInfo.userInfo.userTitleName}}&nbsp;&nbsp;{{doctorInfo.userHospital.userDepartmentName}}</div>
+                <div>{{doctorInfo.userHospital.userHospitalName}}</div>
+            </dd>
+        </dl>
+    </div>
+    <div class="cutOffLine"></div>
+    <div class="doctorDesc">
+        <h3>专业擅长</h3>
+        <p>{{doctorInfo.userInfo.userHonour}}</p>
+        <hr>
+        <h3>个人简介</h3>
+        <p>{{doctorInfo.userInfo.userRemark}}</p>
+    </div>
+
+    <div class="bottom-btn">
+        <a href="{{about.url}}">
+            <button [disabled]="about.isDisable" class="btn open-btn">{{about.name}}</button></a>
+    </div>
+
+</div>
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>
+
+<template #template tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> 
+        <div class="modal-body alertCofirm">
+        <div class="cont">
+        取消关注后，您将不再受到医生的群发消息，医生也将从我的医生界面删除。
+        </div>
+        <div class="btngroup">
+            <button  (click)="modalRef.hide()">继续关注</button>
+            <button (click)="cancelFollow()">取消关注</button>
+        </div>
+        </div>
+  </template>

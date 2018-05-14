@@ -1,0 +1,54 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;<span class="fa fa-chevron-left" aria-hidden="true" onclick="history.go(-1)"></span></div>
+    <div class="left">我的医生</div>
+    <div></div>
+</div>
+<div class="searhList">
+    <div class="linglan_list">
+        <!-- <div class="abcNav">
+            <a *ngFor="let it of doctorList" href="./mydoctor#group{{it.name}}">{{it.name}}</a>
+        </div> -->
+        <div>
+            <div *ngIf="!zixun&&!guanzhu" style="margin:30% auto;font-size:1.6rem;text-align:center;">暂无数据！！</div>
+
+            <div class="letter" *ngIf="zixun">咨询的医生</div>
+            <div class="media" *ngFor="let item of doctorObjList.doctors">
+                <a href="./doctorinfo?id={{item.userId}}">
+                    <div class="media-left">
+                        <img class="media-object" [src]="item.headUrl?baseUrl+item.headUrl:'./assets/img/head.png'" alt="...">
+                    </div>
+                    <div class="media-body">
+                        <h3>{{item.userName}}
+                            <small>{{item.titleName}}</small>
+                            <small>{{item.departmentName}}</small>
+                        </h3>
+                        <p>{{item.hospitalName}} </p>
+                    </div>
+                </a>
+            </div>
+            <div class="letter" *ngIf="guanzhu">关注的医生</div>
+            <div class="media" *ngFor="let item of doctorObjList.followers">
+                <a href="./doctorinfo?id={{item.userId}}">
+                    <div class="media-left">
+                        <a href="#">
+                            <img class="media-object" [src]="item.headUrl?baseUrl+item.headUrl:'./assets/img/head.png'" alt="...">
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h3>{{item.userName}}
+                            <small>{{item.titleName}}</small>
+                            <small>{{item.departmentName}}</small>
+                        </h3>
+                        <p>{{item.hospitalName}} </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>

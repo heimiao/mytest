@@ -1,0 +1,101 @@
+@import "../../sass/mixins";
+@import "../../sass/mixins/button";
+.serviceType {
+    background: #fff;
+    .list_flex {
+        display: flex;
+        height: 6rem;
+        >div {
+            flex: 1;
+            padding: 0px 1.2rem;
+            align-self: center;
+        }
+        >div:first-child {
+            flex: 2;
+            text-align: left;
+            color: #000;
+            font-size: 1.8rem;
+            >small {
+                font-size: 1.4rem;
+                margin-left: .7rem;
+                color: #a4a9ad;
+            }
+        }
+        .ablePrice {
+            text-align: right;
+            font-size: 1.8rem;
+            color: #fea501;
+        }
+        .disablePrice {
+            text-align: right;
+            font-size: 1.8rem;
+            color: grey;
+        }
+    }
+    hr {
+        margin: 0px;
+        border-top: 1px solid #eaeaea;
+        margin-left: .7rem;
+    }
+}
+
+.opration {
+    text-align: center;
+    .callback {
+        width: 100%;
+        margin-top: 1.1rem;
+        background: #fff;
+        textarea {
+            width: 100%;
+            border: 0px;
+            outline: none;
+            padding: 1.5rem .7rem;
+            height: 9.8rem;
+            font-size: 1.6rem;
+            color: #a4a9ad;
+        }
+    }
+    .openserver {
+        border: 1px solid red;
+        @include data-btn(95%, auto, #4590ec);
+        font-size: 1.6rem;
+        margin: 6rem auto 0rem auto;
+    }
+}
+
+.waring {
+    color: #a4a9ad;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.myradio {
+    width: 1.8rem;
+    height: 1.8rem;
+    vertical-align: middle;
+    display: inline-block;
+    background-color: transparent;
+    -webkit-appearance: none;
+    outline: none;
+    border: 0px;
+    margin-left: .5rem;
+    &:before {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        outline: none;
+        border: 0px;
+        content: "";
+        padding-top: 5px;
+        // content: url('../../assets/img/checkbox.png');
+        background: url('../../assets/img/checkbox.png');
+        background-size: 100%;
+    }
+    &:checked {
+        &:before {
+            background: url('../../assets/img/checkbox-cked.png');
+            background-size: 100%;
+        }
+    }
+}

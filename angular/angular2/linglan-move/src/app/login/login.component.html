@@ -1,0 +1,87 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;
+        <span class="fa fa-chevron-left" aria-hidden="true"></span>
+
+    </div>
+    <div class="left">来报到</div>
+    <div></div>
+</div>
+<div class="login_form">
+    <form class="form-horizontal" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
+        <p class="title">请先验证手机号，方便与医生交流</p>
+        <!-- <p>Form value: {{ loginForm.value | json }}</p>
+        <p>Form value: {{ loginForm.invalid | json }}</p> -->
+        <div class="form-group">
+            <div class="input-group icon_input">
+                <!-- <label for="name">姓名</label> -->
+                <div class="input-group-addon glyphicon icon"><img src="./assets/img/icon-name.png" alt=""></div>
+                <input type="text" class="form-control" id="name" placeholder="姓名" required formControlName="userName">
+                <!-- <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                    <div *ngIf="name.errors.required">
+                        Name is required.
+                    </div>
+                    <div *ngIf="name.errors.minlength">
+                        Name must be at least 4 characters long.
+                    </div>
+                    <div *ngIf="name.errors.forbiddenName">
+                        Name cannot be test.
+                    </div>  phone.errors.forbiddenName
+                </div> -->
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group icon_input">
+                <!-- <label for="phone">手机号</label> {{ loginForm.controls.userMobile.errors|json }} -->
+                <div class="input-group-addon glyphicon icon"><img src="./assets/img/icon-phone.png" alt=""></div>
+                <input type="number" class="form-control" id="userMobile" placeholder="请输入手机号" required formControlName="userMobile">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group icon_input">
+                <!-- <span for="code"></span> -->
+                <div class="input-group-addon glyphicon icon"><img src="./assets/img/icon-message.png" alt=""></div>
+                <input type="number" class="form-control" id="code" placeholder="请输入短信验证码" required formControlName="vCode">
+                <span class="input-group-btn">
+                <button class="btn btn-default getcodeBtn" type="button" (click)="openModal(template)" [disabled]="system.sendPicCode.isSend">{{system.sendPicCode.sendStr}}</button>
+            </span>
+            </div>
+        </div>
+
+        <div class="checkbox xieyi">
+            <label for="agreement"><input type="checkbox" class="selfCk" id="agreement" formControlName="agreement">  
+              <span>同意<a href="./patient_rg.html">灵兰随诊用户协议</a> </span>
+            </label>
+        </div>
+
+        <button style="margin-top:3rem;" type="submit" class="btn btn-default btn_info" [disabled]="loginForm.invalid">报到</button>
+
+        <template #template tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"> 
+            <div class="modal-body code_pic"><!--  formGroupName="picCode" -->
+                <h3>请输入图片验证码</h3>
+                <dl>
+                    <dt><img alt="" [src]="system.imgUrl"(click)="refreshCode()"></dt>
+                    <dd>
+                       <!--  <input type="text" maxlength="1" formControlName="code1"  tabindex="1">
+                        <input type="text" maxlength="1" formControlName="code2" tabindex="2">
+                        <input type="text" maxlength="1" formControlName="code3" tabindex="3">
+                        <input type="text" maxlength="1" formControlName="code4" tabindex="4"> -->
+                         <input type="number"  formControlName="picCode" >
+                         <!--<ul>
+                             <li></li>
+                             <li></li>
+                             <li></li>
+                             <li></li>
+                         </ul> -->
+                    </dd>
+                </dl>
+            </div>
+          </template>
+    </form>
+</div>
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>

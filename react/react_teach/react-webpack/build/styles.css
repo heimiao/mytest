@@ -1,0 +1,7 @@
+body {
+  background: url(data:image/jpeg;base64,bW9kdWxlLmV4cG9ydHMgPSBfX3dlYnBhY2tfcHVibGljX3BhdGhfXyArICJpbWFnZXMvYTYwZmQ2MjAudGVzdC5qcGciOw==) center;
+  border: 5px solid red; }
+  body h1 {
+    font-size: 16px; }
+  body .test_img {
+    background: url(data:image/jpeg;base64,bW9kdWxlLmV4cG9ydHMgPSBfX3dlYnBhY2tfcHVibGljX3BhdGhfXyArICJpbWFnZXMvYTYwZmQ2MjAudGVzdC5qcGciOw==) center no-repeat; }

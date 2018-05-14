@@ -1,0 +1,37 @@
+<div class="navTitle">
+    <div class="left">&nbsp;&nbsp;<span class="fa fa-chevron-left" aria-hidden="true" onclick="history.go(-1)"></span></div>
+    <div class="left">医生库</div>
+    <div></div>
+</div>
+<div class="searhList">
+    <div class="search"><i class="fa fa-search" aria-hidden="true" (click)="readList()"></i><input type="text" placeholder="搜索" [(ngModel)]="searhParm.userName" (blur)="readList()"> </div>
+
+    <div class="linglan_list">
+        <!--  <div class="abcNav">
+            <a *ngFor="let it of doctorList" href="./doctorlist#group{{it.name}}">{{it.name}}</a>
+        </div> -->
+        <div class="group{{it.name}}" id="group{{it.name}}" *ngFor="let it of doctorList">
+            <div class="letter">{{it.name}}</div>
+            <div class="media" *ngFor="let item of it.value">
+                <a href="/doctorinfo?id={{item.userId}}">
+                    <div class="media-left">
+                        <img class="media-object" [src]="item.headUrl?baseUrl+item.headUrl:'./assets/img/head.png'" alt="...">
+                    </div>
+                    <div class="media-body">
+                        <h3>{{item.userName}}
+                            <small>{{item.userInfo.userTitleName}}</small>
+                            <small>{{item.userHospital.userDepartmentName}}</small>
+                        </h3>
+                        <p>{{item.userHospital.userHospitalName}} </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngFor="let alert of alerts" class="alertContainer">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout">
+        <div class="cont">{{ alert.msg }}</div>
+    </alert>
+</div>

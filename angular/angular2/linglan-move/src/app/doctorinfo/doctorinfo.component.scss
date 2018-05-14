@@ -1,0 +1,120 @@
+@import "../../sass/mixins";
+@import "../../sass/mixins/button";
+.navTitle {
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    border: 0px;
+    z-index: 2;
+    .guanzhu {
+        .btn {
+            span {
+                display: inline-block;
+                vertical-align: middle;
+                display: flex;
+                align-items: center;
+                &:before {
+                    font-weight: bold;
+                    display: inline-block;
+                    content: "+";
+                    width: 1rem;
+                    height: 60%;
+                    margin-right: .1rem;
+                }
+            }
+            height: 2.3rem;
+            background: #fff;
+            width: 6.1rem;
+            color: #4590ed;
+            font-size: 1.4rem;
+            line-height: 1.3rem;
+            @include radius(2.3rem);
+            text-align:center;
+        }
+        .btn-pre {
+            // @include opacity(50);
+            background: #a8cbf6;
+            color: #fff;
+        }
+    }
+}
+
+.doctorInfo {
+    position: absolute;
+    z-index: 0;
+    top: 0px;
+    width: 100%;
+    text-align: center;
+    min-height: 100%;
+    background: #fff;
+    padding-bottom: 4rem;
+    .cutOffLine {
+        height: 1.3rem;
+        background: #f2f2f2;
+    }
+    .desc {
+        background: #4590ec;
+        color: #fff;
+        height: 23.2rem;
+        padding-top: 7rem;
+        img {
+            width: 6.5rem;
+            height: 6.5rem;
+            @include radius(50%);
+        }
+        dl {
+            dt {
+                margin-top: .7rem;
+                font-size: 2.1rem;
+                img {
+                    width: 1.6rem;
+                    vertical-align: center;
+                    line-height: 2.0rem;
+                    height: 1.6rem;
+                }
+            }
+            dd {
+                >div:first-child {
+                    @include opacity(45);
+                }
+                font-size: 1.8rem;
+                >div {
+                    &:first-child {
+                        font-size: 1.6rem;
+                    }
+                }
+                margin-top: .2rem;
+                // @include opacity(45);
+            }
+        }
+    }
+    .doctorDesc {
+        background: #fff;
+        padding-top: 1.5rem;
+        padding-left: .7rem;
+        text-align: left;
+        h3 {
+            font-size: 1.6rem;
+            color: #000;
+        }
+        p {
+            font-size: 1.6rem;
+            color: #656565;
+            margin: 0px;
+            padding-bottom: 1rem;
+        }
+    }
+    .bottom-btn {
+        position: fixed;
+        border-top: 1px solid #e5e5e5;
+        background: #fff;
+        left: 0px;
+        width: 100%;
+        bottom: 0px;
+        .open-btn {
+            margin: .6rem auto;
+            font-size: 1.6rem;
+            @include data-btn(95%, auto, #4590ec);
+        }
+    }
+}
