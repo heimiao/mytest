@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="bootstrap-3.3.7/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="toastr/toastr.min.css">
+    <link rel="stylesheet" href="css/me.css">
+    <script src="jsSip/jssip.js"></script>
+    <script src="jquery/jquery-1.11.3.js"></script>
+    <script src="toastr/toastr.min.js"></script>
+    <script src="js/me.js"></script>
+    <title>音视频及短信jssip</title>
+</head>
+
+<body>
+    <div class="demo_0">
+        <!--注册登录面板start-->
+        <div class="demo_1" style="display:block">
+            <span class="font_vta">Vtalk_</span>
+            <input id='me_uri' class="me_uri" type="text" placeholder="请输入您的uri地址：">
+            <input id='you_uri' class="you_uri" style="display:none;" type="text" placeholder="请输入对方的uri地址：">
+            <!--<input class="you_uri_call" style="display:none;" type="text" placeholder="请输入对方通话号码">-->
+            <div class="device_module">
+                <span class="device_M" style="display:none" title="短信">M</span>
+                <span class="device_V" style="display:none" title="视频">V</span>
+                <span class="device_C" style="display:none" title="语音">C</span>
+            </div>
+            <!--点击C显示通话图标-->
+            <div class="device_module_call" style='display:none'>
+                <span class="glyphicon glyphicon-earphone callPhoneRedColor" style="display:none"></span>
+                <span class="glyphicon glyphicon-earphone callPhoneRedGreen" style="display:none"></span>
+            </div>
+            <button id="me_next_step" class="me_next_step">下一步</button>
+            <!--<button id="me_last_step" class="me_last_step" style="display:none">上一步</button>-->
+        </div>
+        <!--注册登录面板end-->
+        <!--点击M发短信面板start-->
+        <div id="chatbox_message" style="display:none;">
+            <div id="deaderMessages" class="button">
+                短信消息
+                <span class="deaderMessages_symbol">X</span>
+            </div>
+            <div id="messages"></div>
+            <input id="chatinput" type="text" placeholder="请按Enter键发送消息:">
+            <button id="chatbutton">发送</button>
+        </div>
+        <!--点击M发短信面板end-->
+        <!--点击V视频面板start-->
+        <div id="chatbox_video" style="display:none;">
+            <div id="deaderMessages_video" class="button">
+                正在与<span id='youVideoIng'></span>视频通话中...
+                <span class="deaderMessages_symbol_video">X</span>
+            </div>
+            <div id="messages_video"></div>
+            <!--右侧视频专区-->
+            <div class="videoPrefecture_video">
+                <video id="youVideo" class="oneVideo"></video>
+                <video id="meVideo" class="twoVideo"></video>
+                <span class="glyphicon glyphicon-volume-down"></span>
+                <span class="glyphicon glyphicon-off"></span>
+            </div>
+
+            <input id="chatinput_video" type="text" placeholder="请按Enter键发送消息:">
+            <button id="chatbutton_video">发送</button>
+        </div>
+        <!--点击V视频面板end-->
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,371 @@
+ * {
+            margin: 0px;
+            padding: 0xp;
+        }
+        /*背景图自适应*/
+
+        .demo_0 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url(../images/bg.jpg);
+            background-size: 100% 100%;
+        }
+
+        .demo_1 {
+            position: absolute;
+            width: 500px;
+            height: 400px;
+            background-color: #fff;
+            border-radius: 10px;
+            top: 50%;
+            left: 50%;
+            margin-left: -250px;
+            margin-top: -200px;
+        }
+        /*短信发送面板start*/
+
+        #chatbox_message {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            margin-left: -250px;
+            margin-top: -200px;
+            z-index: 1;
+        }
+
+        #deaderMessages {
+            width: 509px;
+            box-shadow: inset 0px 1px 0px 0px #ffffff;
+            background: -webkit-gradient( linear, left top, left bottom,
+            color-stop(0.05, #ededed),
+            color-stop(1, #dfdfdf));
+            background-color: #ededed;
+            border-radius: 6px;
+            border: 1px solid #dcdcdc;
+            display: inline-block;
+            color: #777777;
+            font-family: arial;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 6px 24px;
+            text-decoration: none;
+            text-shadow: 1px 1px 0px #ffffff;
+        }
+
+        .deaderMessages_symbol {
+            cursor: pointer;
+            position: absolute;
+            right: 8px;
+        }
+
+        #messages {
+            position: relative;
+            display: block;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow: scroll;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 5px 5px 0px 0px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 400px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 510px;
+        }
+
+        #chatinput {
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 0px 0px 5px 5px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 52px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 440px;
+        }
+
+        #chatbutton {
+            position: absolute;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 0px 0px 5px 5px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 52px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 70px;
+        }
+        /*短信发送面板end*/
+        /*短信与视频消息start*/
+
+        #chatbox_video {
+            position: absolute;
+            top: 45%;
+            left: 38%;
+            margin-left: -250px;
+            margin-top: -200px;
+            z-index: 1;
+        }
+
+        #deaderMessages_video {
+            width: 840px;
+            box-shadow: inset 0px 1px 0px 0px #ffffff;
+            background: -webkit-gradient( linear, left top, left bottom,
+            color-stop(0.05, #ededed),
+            color-stop(1, #dfdfdf));
+            background-color: #ededed;
+            border-radius: 6px;
+            border: 1px solid #dcdcdc;
+            display: inline-block;
+            color: #777777;
+            font-family: arial;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 6px 24px;
+            text-decoration: none;
+            text-shadow: 1px 1px 0px #ffffff;
+        }
+
+        .deaderMessages_symbol_video {
+            cursor: pointer;
+            position: absolute;
+            right: 8px;
+        }
+
+        #messages_video {
+            position: relative;
+            display: block;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow: scroll;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 5px 5px 0px 0px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 400px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 310px;
+        }
+
+        .videoPrefecture_video {
+            position: absolute;
+            top: 35px;
+            right: 0px;
+            width: 530px;
+            height: 450px;
+            background-color: #f9f9f9;
+        }
+
+        .oneVideo {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 359px;
+            height: 400px;
+            background-color: #000;
+        }
+
+        .twoVideo {
+            position: absolute;
+            bottom: 50px;
+            right: 0px;
+            width: 160px;
+            height: 160px;
+            border: 1px solid #fff;
+            /*background-color: #000;*/
+        }
+
+        .glyphicon-volume-down {
+            cursor: pointer;
+            top: 415px;
+            left: 200px;
+            width: 20px;
+            height: 20px;
+            font-size: 25px;
+            color: #0aa1f9;
+        }
+
+        .glyphicon-off {
+            cursor: pointer;
+            top: 412px;
+            left: 286px;
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            color: red;
+        }
+
+        #chatinput_video {
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 0px 0px 5px 5px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 52px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 240px;
+        }
+
+        #chatbutton_video {
+            position: absolute;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border: 1px solid #CCCCCC;
+            border-radius: 0px 0px 5px 5px;
+            font: 300 18px/40px 'light', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            height: 52px;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+            padding: 5px 10px;
+            width: 70px;
+        }
+        /*短信与视频消息end*/
+
+        .font_vta {
+            position: absolute;
+            font-size: 40px;
+            font-weight: 600;
+            top: 100px;
+            left: 190px;
+        }
+
+        .me_uri {
+            position: absolute;
+            outline: none;
+            width: 220px;
+            height: 40px;
+            border-radius: 5px;
+            top: 180px;
+            left: 140px;
+        }
+
+        .you_uri {
+            position: absolute;
+            outline: none;
+            width: 220px;
+            height: 40px;
+            border-radius: 5px;
+            top: 180px;
+            left: 140px;
+        }
+
+        .you_uri_call {
+            position: absolute;
+            outline: none;
+            width: 220px;
+            height: 40px;
+            border-radius: 5px;
+            top: 180px;
+            left: 140px;
+        }
+
+        .me_next_step {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 100px;
+            height: 40px;
+            border: 1px solid #00ffe7;
+            background-color: #00ffe7;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .me_last_step {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 100px;
+            height: 40px;
+            border: 1px solid #00ffe7;
+            background-color: #00ffe7;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .device_module {
+            position: absolute;
+            width: 220px;
+            height: 40px;
+            top: 240px;
+            left: 140px;
+        }
+
+        .device_module_call {
+            position: absolute;
+            width: 220px;
+            height: 40px;
+            top: 240px;
+            left: 140px;
+        }
+
+        .callPhoneRedColor {
+            cursor: pointer;
+            position: absolute;
+            color: red;
+            font-size: 30px;
+            left: 50px;
+            display: block;
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .callPhoneRedGreen {
+            cursor: pointer;
+            position: absolute;
+            color: lawngreen;
+            font-size: 30px;
+            left: 140px;
+            display: block;
+            text-align: center;
+            line-height: 40px;
+        }
+
+        .device_M {
+            cursor: pointer;
+            position: absolute;
+            color: #ff00bc;
+            left: 5px;
+            display: block;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            background-color: lawngreen;
+            border-radius: 20px;
+        }
+
+        .device_V {
+            cursor: pointer;
+            position: absolute;
+            color: #ff00bc;
+            left: 92px;
+            display: block;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            background-color: lawngreen;
+            border-radius: 20px;
+        }
+
+        .device_C {
+            cursor: pointer;
+            position: absolute;
+            color: #ff00bc;
+            left: 180px;
+            display: block;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            background-color: lawngreen;
+            border-radius: 20px;
+        }

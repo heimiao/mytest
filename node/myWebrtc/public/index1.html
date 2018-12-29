@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js"></script>
+		<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+		<script src="https://cdn.bootcss.com/adapterjs/0.15.3/adapter.min.js"></script>
+		<script src="lib/JsSIP/dist/jssip.js"></script>
+		<script>
+			//			JsSIP.debug.enable('JsSIP:*');
+			JsSIP.debug.disable('JsSIP:*');
+		</script>
+		<title>语音通信</title>
+		<style type="text/css">
+			video {
+				width: 250px;
+				height: 200px
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="myphone" style="width:50%;margin:0px auto;">
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<h3>电话演示</h3></div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-12" id="showMessage" style="width:100%;height:100px;overflow-y:auto;border:1px solid red;">
+						</div>
+
+						<div class="col-12" style="margin:15px auto;">
+							<div class="form-row align-items-center">
+								<div class="col-10">
+									<label class="sr-only" for="inlineFormInput">注册号</label>
+									<input type="text" id="myPhoneNum" class="form-control" value="1000" placeholder="(1000-10019)可选，如果不输入默认是1000" />
+								</div>
+								<div class="col-auto">
+									<button class="btn btn-success" onclick="register()">注册</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12" style="margin:25px auto;">
+							<div class="form-row align-items-center">
+								<div class="col-8">
+									<label class="sr-only" for="inlineFormInput">拨打号码</label>
+									<input type="text" id="ohterPhoneNum" class="form-control" placeholder="(1000-10019)可选，除本机之外" />
+								</div>
+								<div class="col-auto">
+									<button class="btn btn-success" onclick="call()">拨打电话</button>
+									<button class="btn btn-success" onclick="call()">挂断电话</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-6">
+							<audio id="localAudio" controls="controls" autoplay="autoplay"></audio>
+						</div>
+						<div class="col-6">
+							<audio id="remoteAudio" controls="controls" autoplay="autoplay"></audio>
+						</div>
+
+						<div class="col-6">
+							<video id="localVideo" width="100%" height="320px" controls="controls" autoplay="autoplay"></video>
+						</div>
+						<div class="col-6">
+							<video id="remoteVideo" width="100%" height="320px" controls="controls" autoplay="autoplay"></video>
+						</div>
+
+						<div class="col-12">
+							<button class="btn btn-success" onclick="openVideo()">打开视频</button>
+							<button class="btn btn-success" onclick="openVideo()">关闭视频</button>
+							<button class="btn btn-success" onclick="openVideo()">来电拒接</button>
+							<button class="btn btn-success" onclick="openVideo()">来电接通</button>
+						</div>
+							
+						<div class="col-12" style="margin:25px auto;">
+							<div class="form-row">
+								<div class="col-8">
+									<label class="sr-only" for="inputMsg">输入消息</label>
+									<textarea type="text" id="inputMsg" class="form-control" placeholder="请输入消息"></textarea>
+								</div>
+								<div class="col-auto">
+									<button class="btn btn-success" onclick="sendMsg()">发送短信</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/phone.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			function register() {
+				phone.register($("#myPhoneNum").val());
+			}
+
+			function call() {
+				phone.callUpPhone($("#ohterPhoneNum").val());
+			}
+
+			function sendMsg() {
+				phone.sendMessage($("#ohterPhoneNum").val(), $("#inputMsg").val());
+			}
+
+			function openVideo() {
+				//el||string
+				phone.openVide(document.getElementById("localVideo"), "remoteVideo");
+			}
+		</script>
+	</body>
+
+</html>

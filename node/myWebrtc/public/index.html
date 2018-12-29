@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>JsSIP + freeSWITCH</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="Author" content="Fly" />
+		<meta name="description" content="JsSIP Test DEMO" />
+		<link href="https://cdn.bootcss.com/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://cdn.bootcss.com/adapterjs/0.15.3/adapter.min.js"></script>
+		<script src="lib/JsSIP/dist/jssip.js"></script>
+	</head>
+
+	<body>
+		<div style="padding-bottom:10px;font-weight:bold;">控制台</div>
+		<div id="login-page" style="width: 500px; border: 1px solid #f0f0f0;">
+			<table border="0">
+				<tr>
+					<td width="160px" align="left"><label for="sip_uri">自己的SIP URI:</label></td>
+					<td width="300px"><input style="width:250px" id="sip_uri" type="text" value="sip:1000@192.168.171.12:5060" /></td>
+				</tr>
+				<tr>
+					<td align="left"><label for="sip_password">SIP Password:</label></td>
+					<td><input style="width:250px" id="sip_password" type="password" value="1234" /></td>
+				</tr>
+				<tr>
+					<td align="left"><label for="ws_uri">WSS URI:</label></td>
+					<td><input style="width:250px" id="ws_uri" class="last unset" type="text" value="wss://192.168.171.12:7443" /></td>
+				</tr>
+				<tr>
+					<td align="left"><label class="input_label" for="sip_phone_number">拨打SIP URI:</label></td>
+					<td><input style="width:250px" id="sip_phone_number" type="text" value="sip:1001@192.168.171.12:5060"></td>
+				</tr>
+				<tr>
+					<td align="left"><input type="button" onclick="testStart()" value="注册" /></td>
+					<td align="left"><input type="button" onclick="testCall()" value="拨打" /></td>
+				</tr>
+			</table>
+		</div>
+
+		<div style="padding-top:10px;padding-bottom:10px;font-weight:bold;">视频展示区</div>
+		<div style="padding-top:10px;" align="left">
+			<table border="0">
+				<tr>
+					<video id="meVideo" style="padding-right:10px"></video>
+					<video id="youVideo"></video>
+				</tr>
+			</table>
+		</div>
+
+	</body>
+	<script type="text/javascript">
+		var outgoingSession = null;
+		var incomingSession = null;
+		var currentSession = null;
+		var meVideo = document.getElementById('meVideo');
+		meVideo.setAttribute('autoplay', '');
+		//meVideo.setAttribute('muted', '');
+		meVideo.setAttribute('playsinline', '');
+		meVideo.style.width = '360px';
+
+		var youVideo = document.getElementById('youVideo');
+		youVideo.setAttribute('autoplay', '');
+		//meVideo.setAttribute('muted', '');
+		youVideo.setAttribute('playsinline', '');
+		youVideo.style.width = '360px';
+
+		var constraints = {
+			audio: true,
+			video: {
+				faceMode: 'user'
+			}
+		};
+
+		var localStream = null;
+		var userAgent = null;
+
+		navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
+			meVideo.srcObject = stream;
+			document.body.addEventListener('click', function() {
+				meVideo.play();
+			});
+			// wait until the video stream is ready
+			var interval = setInterval(function() {
+				if(!meVideo.videoWidth) {
+					return;
+				}
+				//stage.appendChild(videoView);
+				clearInterval(interval);
+			}, 1000 / 50);
+		}).catch(function(error) {
+			onError({
+				name: error.name,
+				message: error.message
+			});
+		});
+
+		function testStart() {
+			var sip_uri = document.getElementById("sip_uri").value.toString();
+			var sip_password = document.getElementById("sip_password").value.toString();
+			var ws_uri = document.getElementById("ws_uri").value.toString();
+			var socket = new JsSIP.WebSocketInterface(ws_uri);
+			var configuration = {
+				sockets: [socket],
+				outbound_proxy_set: ws_uri,
+				uri: sip_uri,
+				password: sip_password,
+				register: true,
+				session_timers: false
+			};
+			userAgent = new JsSIP.UA(configuration);
+			userAgent.on('registered', function(data) {
+				console.info("注册: ", data.response.status_code, ",", data.response.reason_phrase);
+			});
+
+			userAgent.on('registrationFailed', function(data) {
+				console.log("注册失败, ", data);
+			});
+
+			userAgent.on('registrationExpiring', function() {
+				console.warn("registrationExpiring");
+			});
+
+			userAgent.on('newRTCSession', function(data) {
+				if(data.originator == 'remote') {
+					console.info("incomingSession, answer the call");
+					incomingSession = data.session;
+					data.session.answer({
+						'mediaConstraints': constraints,
+						'mediaStream': null
+					});
+				} else {
+					console.info("outgoingSession");
+					outgoingSession = data.session;
+					outgoingSession.on('connecting', function(data) {
+						console.info('onConnecting - ', data.request);
+						currentSession = outgoingSession;
+						outgoingSession = null;
+					});
+				}
+
+				data.session.on('accepted', function(data) {
+					console.info('onAccepted - ', data);
+					if(data.originator == 'remote' && currentSession == null) {
+						currentSession = incomingSession;
+						incomingSession = null;
+						console.info("setCurrentSession - ", currentSession);
+					}
+				});
+
+				data.session.on('confirmed', function(data) {
+					console.info('onConfirmed - ', data);
+					if(data.originator == 'remote' && currentSession == null) {
+						currentSession = incomingSession;
+						incomingSession = null;
+						console.info("setCurrentSession - ", currentSession);
+					}
+				});
+
+				data.session.on('sdp', function(data) {
+					console.info('onSDP, type - ', data.type, ' sdp - ', data.sdp);
+					//data.sdp = data.sdp.replace('UDP/TLS/RTP/SAVPF', 'RTP/SAVPF');
+					//console.info('onSDP, changed sdp - ', data.sdp);
+				});
+
+				data.session.on('progress', function(data) {
+					console.info('onProgress - ', data.originator);
+					if(data.originator == 'remote') {
+						console.info('onProgress, response - ', data.response);
+					}
+				});
+
+				data.session.on('peerconnection', function(data) {
+					console.info('onPeerconnection - ', data.peerconnection);
+					data.peerconnection.onaddstream = function(ev) {
+						console.info('onaddstream from remote - ', ev);
+						youVideo.srcObject = ev.stream;
+
+						document.body.addEventListener('click', function() {
+							meVideo.play();
+						});
+						// wait until the video stream is ready
+						var interval = setInterval(function() {
+							if(!meVideo.videoWidth) {
+								return;
+							}
+							//stage.appendChild(videoView);
+							clearInterval(interval);
+						}, 1000 / 50);
+
+					};
+				});
+
+			});
+
+			userAgent.on('newMessage', function(data) {
+				if(data.originator == 'local') {
+					console.info('onNewMessage , OutgoingRequest - ', data.request);
+				} else {
+					console.info('onNewMessage , IncomingRequest - ', data.request);
+				}
+			});
+			console.info("注册电话");
+			userAgent.start();
+		}
+
+		// Register callbacks to desired call events
+		var eventHandlers = {
+			'progress': function(e) {
+				console.log('通话进度');
+			},
+			'failed': function(e) {
+				console.log('call failed: ', e);
+				alert('呼叫失败');
+			},
+			'ended': function(e) {
+				console.log('call ended : ', e);
+			},
+			'confirmed': function(e) {
+				console.log('call confirmed');
+			}
+		};
+
+		function testCall() {
+			var sip_phone_number = document.getElementById("sip_phone_number").value.toString();
+			var options = {
+				'eventHandlers': eventHandlers,
+				'mediaConstraints': constraints,
+				'mediaStream': null
+			};
+
+			outgoingSession = userAgent.call(sip_phone_number, options);
+		}
+	</script>
+
+</html>
