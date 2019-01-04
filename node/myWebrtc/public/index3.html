@@ -2,164 +2,224 @@
 <html>
 
 	<head>
-		<meta charset="utf-8">
-		<title>sipjstest</title>
-		<link rel="stylesheet" href="css/style.css" />
+		<title>JsSIP + WebRTC + freeSWITCH</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="Author" content="foruok" />
+		<meta name="description" content="JsSIP based example web application." />
+		<script src="lib/JsSIP/dist/jssip.js"></script>
 	</head>
-
 	<body>
-		<input id="number" value="1001" type="text" />
-		<button id="startCall">拨打</button>
-		<button id="endCall">End Call</button>
-		<button id="transfer">盲转</button>
-		<button id="hold">hold</button>
-		<button id="unhold">unhold</button>
-		<br>
-		<input id="msg" value="你好" type="text" />
-		<button id="sendMessage">Send Message</button>
-		<div style="display:none">
-			<video autoplay>Video Disabled or Unavailable</video>
-		</div>
-		<!-- DTMF -->
-		<div id="dtmf-buttons">
-			<button onclick="sendDtmf('1');">1</button>
-			<button onclick="sendDtmf('2');">2</button>
-			<button onclick="sendDtmf('3');">3</button>
-			<button onclick="sendDtmf('4');">4</button>
-			<button onclick="sendDtmf('5');">5</button>
-			<button onclick="sendDtmf('6');">6</button>
-			<button onclick="sendDtmf('7');">7</button>
-			<button onclick="sendDtmf('8');">8</button>
-			<button onclick="sendDtmf('9');">9</button>
-			<button onclick="sendDtmf('0');">0</button>
-			<button onclick="sendDtmf('#');">#</button>
-			<button onclick="sendDtmf('*');">*</button>
-		</div>
-		<script src="lib/sip-0.7.8.js"></script>
-		<script>
-			var config = {
-				uri: '1005@127.0.0.1',
-				ws_servers: 'wss://192.168.117.12:7443',
-				authorizationUser: '1001',
-				password: '1234'
-			};
-			var ua = new SIP.UA(config);
 
-			var sessionall;
-			var startCall = document.getElementById('startCall');
-			var endCall = document.getElementById('endCall');
-			var transfer = document.getElementById('transfer');
-			var hold = document.getElementById('hold');
-			var unhold = document.getElementById('unhold');
-			var sendMessage = document.getElementById('sendMessage');
-			// 接受入站（用户代理服务器）会话
-			ua.on('invite', function(session) {
-				var url = session.remoteIdentity.uri.toString() + "来电了，是否接听";
-				var isaccept = confirm(url);
-				if(isaccept) {
-					//接受来电
-					session.accept({
-						mediaConstraints: {
-							audio: true,
-							video: false
-						}
-					});
-					sessionall = session;
-				} else {
-					//拒绝来电
-					session.reject();
-				}
+		<div id="login-page" style="width: 424px; height: 260px; background-color: #f2f4f4; border: 1px solid grey; padding-top: 4px">
+			<table border="0" frame="void" width="418px">
+				<tr>
+					<td class="td_label" width="160px" align="right"><label for="sip_uri">SIP URI:</label></td>
+					<td width="258px"><input style="width:250px" id="sip_uri" type="text" value="sip:1015@192.168.171.12:5060" placeholder="SIP URI (i.e: sip:alice@example.com)" /></td>
+				</tr>
+				<tr>
+					<td class="td_label" align="right"><label for="sip_password">SIP Password:</label></td>
+					<td><input style="width:250px" id="sip_password" type="password" value="1234" placeholder="SIP password" /></td>
+				</tr>
+				<tr>
+					<td class="td_label" align="right"><label for="ws_uri">WSS URI:</label></td>
+					<td><input style="width:250px" id="ws_uri" class="last unset" type="text" value="wss://192.168.171.12:7443" placeholder="WSS URI (i.e: wss://example.com)" /></td>
+				</tr>
+				<tr>
+					<td class="td_label" align="right"><label class="input_label" for="sip_phone_number">SIP Phone Info:</label></td>
+					<td><input style="width:250px" id="sip_phone_number" type="text" value="sip:1016@192.168.171.12:5060" placeholder="sip:3000@192.168.40.96:5060"></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><button onclick="testStart()"> Initialize </button></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><button onclick="testCall()"> Call </button></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><button onclick="captureLocalMedia()"> Capture Local Media</button></td>
+				</tr>
+			</table>
+		</div>
 
-			});
-			//拨打事件
-			myAddEvent(startCall, 'click', function() {
-				var number = document.getElementById("number").value;
-				//创建一个新的出站（用户代理客户端）会话
-				sessionall = ua.invite(number, {
-					mediaConstraints: {
-						audio: true,
-						video: false
-					}
-				});
-				//每次收到成功的最终（200-299）响应时都会触发。
-				sessionall.on("accepted", function(response, cause) {
-					
-					console.log(response);
-					var element = document.querySelector('video');
-					var stream = this.mediaHandler.getRemoteStreams()[0];
-					if(typeof element.srcObject !== 'undefined') {
-						element.srcObject = stream;
-					}
-				})
-				//挂机时会触发
-				sessionall.on("bye", function(response, cause) {
-					console.log(response);
-					alert(response.call_id);
-				})
-				//请求失败时触发，无论是由于最终响应失败，还是由于超时，传输或其他错误。
-				sessionall.on("failed", function(response, cause) {
-					console.log("拨打失败");
-				})
-			})
-			//挂断事件
-			myAddEvent(endCall, 'click', function() {
-				if(!sessionall) {
-					return;
-				} else if(sessionall.startTime) { // Connected
-					sessionall.bye();
-				} else if(sessionall.reject) { // Incoming
-					sessionall.reject();
-				} else if(sessionall.cancel) { // Outbound
-					sessionall.cancel();
-				}
-			})
-			//发送DTMF
-			function sendDtmf(num) {
-				sessionall.dtmf(num);
-			}
-			//电话转移盲转
-			myAddEvent(transfer, 'click', function() {
-				if(!sessionall) {
-					return;
-				}
-				var number = document.getElementById("number").value;
-				sessionall.refer(number);
-			})
-			//电话保持
-			myAddEvent(hold, 'click', function() {
-				if(!sessionall) {
-					return;
-				}
-				sessionall.hold();
-			})
-			//恢复电话保持
-			myAddEvent(unhold, 'click', function() {
-				if(!sessionall) {
-					return;
-				}
-				sessionall.unhold();
-			})
-			//发送消息
-			myAddEvent(sendMessage, 'click', function() {
-				// Sends a new message
-				var number = document.getElementById("number").value;
-				var message = document.getElementById("msg").value;
-				ua.message(number, message);
-				// When receiving a message, prints it out
-				ua.on('message', function(message) {
-					console.log(message.body);
-				});
-			})
-			/*公共通用方法obj为要绑定事件的元素，ev为要绑定的事件，fn为绑定事件的函数*/
-			function myAddEvent(obj, ev, fn) {
-				if(obj.attachEvent) {
-					obj.attachEvent("on" + ev, fn);
-				} else {
-					obj.addEventListener(ev, fn, false);
-				}
-			}
-		</script>
+		<div style="width: 424px; height: 324px;background-color: #333333; border: 2px solid blue; padding:0px; margin-top: 4px;">
+			<video id="videoView" width="420px" height="320px" autoplay></video>
+			<video id="youView" width="420px" height="320px" autoplay></video>
+		</div>
 
 	</body>
+	<script type="text/javascript">
+		var outgoingSession = null;
+		var incomingSession = null;
+		var currentSession = null;
+		var videoView = document.getElementById('videoView');
 
+		var constraints = {
+			audio: true,
+			video: true,
+			mandatory: {
+				maxWidth: 640,
+				maxHeight: 360
+			}
+		};
+		URL = window.URL || window.webkitURL;
+
+		var localStream = null;
+		var userAgent = null;
+
+		function gotLocalMedia(stream) {
+			console.info('Received local media stream');
+			localStream = stream;
+			videoView.src = URL.createObjectURL(stream);
+		}
+
+		function captureLocalMedia() {
+			navigator.mediaDevices.getUserMedia(this.constraints).then((stream)=>{
+				localStream = stream;
+				videoView.srcObject = stream;
+			})
+		/*	navigator.webkitGetUserMedia(constraints, gotLocalMedia, function(e) {
+				alert('getUserMedia() error: ' + e.name);
+			});*/
+		}
+
+		function testStart() {
+
+			var sip_uri_ = document.getElementById("sip_uri").value.toString();
+			var sip_password_ = document.getElementById("sip_password").value.toString();
+			var ws_uri_ = document.getElementById("ws_uri").value.toString();
+
+			console.info("get input info: sip_uri = ", sip_uri_, " sip_password = ", sip_password_, " ws_uri = ", ws_uri_);
+
+			var socket = new JsSIP.WebSocketInterface(ws_uri_);
+			var configuration = {
+				sockets: [socket],
+				outbound_proxy_set: ws_uri_,
+				uri: sip_uri_,
+				password: sip_password_,
+				register: true,
+				session_timers: false
+			};
+
+			userAgent = new JsSIP.UA(configuration);
+
+			userAgent.on('registered', function(data) {
+				console.info("registered: ", data.response.status_code, ",", data.response.reason_phrase);
+			});
+
+			userAgent.on('registrationFailed', function(data) {
+				console.log("registrationFailed, ", data);
+				//console.warn("registrationFailed, ", data.response.status_code, ",", data.response.reason_phrase, " cause - ", data.cause);
+			});
+
+			userAgent.on('registrationExpiring', function() {
+				console.warn("registrationExpiring");
+			});
+
+			userAgent.on('newRTCSession', function(data) {
+				console.info('onNewRTCSession: ', data);
+				if(data.originator == 'remote') { //incoming call
+					console.info("incomingSession, answer the call");
+					incomingSession = data.session;
+					data.session.answer({
+						'mediaConstraints': {
+							'audio': true,
+							'video': true,
+							mandatory: {
+								maxWidth: 640,
+								maxHeight: 360
+							}
+						},
+						'mediaStream': localStream
+					});
+				} else {
+					console.info("outgoingSession");
+					outgoingSession = data.session;
+					outgoingSession.on('connecting', function(data) {
+						console.info('onConnecting - ', data.request);
+						currentSession = outgoingSession;
+						outgoingSession = null;
+					});
+				}
+				data.session.on('accepted', function(data) {
+					console.info('onAccepted - ', data);
+					if(data.originator == 'remote' && currentSession == null) {
+						currentSession = incomingSession;
+						incomingSession = null;
+						console.info("setCurrentSession - ", currentSession);
+					}
+				});
+				data.session.on('confirmed', function(data) {
+					console.info('onConfirmed - ', data);
+					if(data.originator == 'remote' && currentSession == null) {
+						currentSession = incomingSession;
+						incomingSession = null;
+						console.info("setCurrentSession - ", currentSession);
+					}
+				});
+				data.session.on('sdp', function(data) {
+					console.info('onSDP, type - ', data.type, ' sdp - ', data.sdp);
+					//data.sdp = data.sdp.replace('UDP/TLS/RTP/SAVPF', 'RTP/SAVPF');
+					//console.info('onSDP, changed sdp - ', data.sdp);
+				});
+				data.session.on('progress', function(data) {
+					console.info('onProgress - ', data.originator);
+					if(data.originator == 'remote') {
+						console.info('onProgress, response - ', data.response);
+					}
+				});
+				data.session.on('peerconnection', function(data) {
+					console.info('onPeerconnection - ', data.peerconnection);
+					data.peerconnection.onaddstream = function(ev) {
+						console.info('onaddstream from remote - ', ev);
+						videoView.src = URL.createObjectURL(ev.stream);
+					};
+				});
+			});
+
+			userAgent.on('newMessage', function(data) {
+				if(data.originator == 'local') {
+					console.info('onNewMessage , OutgoingRequest - ', data.request);
+				} else {
+					console.info('onNewMessage , IncomingRequest - ', data.request);
+				}
+			});
+
+			console.info("call register");
+			userAgent.start();
+		}
+
+		// Register callbacks to desired call events
+		var eventHandlers = {
+			'progress': function(e) {
+				console.log('call is in progress');
+			},
+			'failed': function(e) {
+				console.log('call failed: ', e);
+			},
+			'ended': function(e) {
+				console.log('call ended : ', e);
+			},
+			'confirmed': function(e) {
+				console.log('call confirmed');
+			}
+		};
+
+		function testCall() {
+			var sip_phone_number_ = document.getElementById("sip_phone_number").value.toString();
+			var options = {
+				'eventHandlers': eventHandlers,
+				'mediaConstraints': {
+					'audio': true,
+					'video': true,
+					mandatory: {
+						maxWidth: 640,
+						maxHeight: 360
+					}
+				},
+				'mediaStream': localStream
+			};
+
+			//outgoingSession = userAgent.call('sip:3000@192.168.40.96:5060', options);
+			outgoingSession = userAgent.call(sip_phone_number_, options);
+		}
+	</script>
 </html>

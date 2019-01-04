@@ -7,9 +7,27 @@ var phone = (function() {
 			wssUrl: new JsSIP.WebSocketInterface('wss://192.168.171.12:7443'),
 			remoteNum: "sip:1001@192.168.171.12:5060",
 		}
+		this.constraints = {
+			audio: true,
+			video: false,
+		}
+		this.localStream = null;
 		this.ua = null;
+		this.incomingSession = null;
+		this.currentSession = null;
+		this.outgoingSession = null;
+		//初始化电话页面
+		this.init();
 	}
+	Phone.prototype.init = function() {
+		//获取本地视频
+		this.localAudio = document.getElementById("localAudio");
+		this.remoteAudio = document.getElementById("remoteAudio");
 
+		this.localVideo = document.getElementById("localVideo");
+		this.remoteVideo = document.getElementById("remoteVideo");
+
+	}
 	Phone.prototype.register = function(args) {
 		//注册
 		var configuration = {
@@ -40,29 +58,89 @@ var phone = (function() {
 			console.log("因注册失败而触发, ", data);
 		});
 		this.ua.on('registrationExpiring', function() {
-			ua.register();
+			//this.ua.register();
 			console.log("注册过期");
 		});
 		this.ua.on('newRTCSession', function(data) {
 			console.log("传入或传出的会话/呼叫触发");
 			if(data.originator == "remote") {
-				var msg = data.request.body
-				console.log(data);
-				data.session.on('peerconnection', function(datas) {
-					datas.peerconnection.onaddstream = function(ev) {
-						//this.remoteVideo.srcObject = ev.stream;
-						console.log(ev.stream);
-						doucment.getElementById("remoteVideo").srcObject=ev.stream;
-						
-					};
+				//远程呼入
+				this.incomingSession = data.session;
+				data.session.answer({
+					'mediaConstraints': this.constraints,
+					'mediaStream': this.localStream
 				});
+				var remoteCall = data.request.headers.From['0'].raw;
+				var remotePhone = this.incomingSession.direction
+				console.log("呼叫描述");
+				console.log(this.incomingSession);
 			}
-			
 			if(data.originator == "local") {
 				var msg = data.request.body
+				this.outgoingSession = data.session;
+				this.outgoingSession.on('connecting', function(data) {
+					this.currentSession = this.outgoingSession;
+					outgoingSession = null;
+				});
+
 				console.log(data);
 			}
+			data.session.on('accepted', function(data) {
+				console.info('通话被接受时  2XX收/发 - accepted', data);
+				if(data.originator == 'remote' && this.currentSession == null) {
+					this.currentSession = this.incomingSession;
+					this.incomingSession = null;
+					console.info("setCurrentSession - ", currentSession);
+				}
+			});
+
+			data.session.on('confirmed', function(data) {
+				console.info('通话确认--onConfirmed - ', data);
+				if(data.originator == 'remote' && this.currentSession == null) {
+					this.currentSession = this.incomingSession;
+					this.incomingSession = null;
+					console.info("setCurrentSession - ", this.currentSession);
+				}
+			});
+			//
+			data.session.on('peerconnection', function(args) {
+				console.log("看是否能拿到数据" + data);
+				args.peerconnection.onaddstream = function(ev) {
+					this.remoteAudio.srcObject = ev.stream;
+					// wait until the video stream is ready
+					/*var interval = setInterval(function() {
+						if(!meVideo.videoWidth) {
+							return;
+						}
+						//stage.appendChild(videoView);
+						clearInterval(interval);
+					}, 1000 / 50);
+*/
+				};
+			});
+
+			data.session.on('connecting', function(data) {
+				console.log("在本地媒体流加入RTCSession之后，在ICE采集开始之前触发初始INVITE请求或“200 OK”响应传输--Connection");
+			});
+			data.session.on('sending', function(data) {
+				console.log("在发送初始INVITE之前触发（仅用于拨出电话）--sending");
+			});
+			data.session.on('ended', function(data) {
+				console.info('已建立的通话结束时触发--ended - ', data);
+			});
+			//在将远程SDP传递给RTC引擎之前以及在发送本地SDP之前触发。
+			data.session.on('sdp', function(data) {
+				console.info('onSDP, type - ', data.type, ' sdp - ', data.sdp);
+				//data.sdp = data.sdp.replace('UDP/TLS/RTP/SAVPF', 'RTP/SAVPF');
+				//console.info('onSDP, changed sdp - ', data.sdp);
+			});
+			data.session.on('progress', function(data) {
+				if(data.originator == 'remote') {
+					console.log(".在接收或生成对INVITE请求的1XX SIP类别响应（> 100）时触发--progress");
+				}
+			});
 		});
+
 		this.ua.on('newMessage', function(data) {
 			console.log("针对传入或传出的MESSAGE请求触发。");
 			if(data.originator == "remote") {
@@ -93,6 +171,8 @@ var phone = (function() {
 			alert("请先注册你的电话")
 			return false;
 		}
+		//打开本地视频流
+		this.openVide();
 		var eventHandlers = {
 			'progress': function(e) {
 				console.log('通话过程');
@@ -107,13 +187,13 @@ var phone = (function() {
 				console.log('呼叫确认');
 			}
 		};
+		//this.localAudio.onloadstart = () => {//}
+		
+		console.log(this.localStream);
 		var options = {
 			'eventHandlers': eventHandlers, //Object事件处理程序的可选项将被注册到每个呼叫事件。为每个要通知的事件定义事件处理
-			'mediaConstraints': {
-				'audio': true,
-				'video': true
-			},
-			'mediaStream': null, //MediaStream 传送到另一端。
+			'mediaConstraints': this.constraints,
+			'mediaStream': this.localStream, //MediaStream 传送到另一端。
 			/*'pcConfig':{
 				//穿透nat所需的服务器
 				'iceServers': [
@@ -128,14 +208,16 @@ var phone = (function() {
 			//'Anonymous':null,   // Boolean指示是否应该匿名完成呼叫。默认值是false
 			//'sessionTimersExpires':null,   // Number （以秒为单位）默认的会话定时器间隔（默认值是90，不要设置一个较低的值）。
 		};
-		var session = this.ua.call('sip:' + args + '@' + this._default.serverUrl, options);
+		this.outgoingSession = this.ua.call('sip:' + args + '@' + this._default.serverUrl, options);
+
 	}
+
 	Phone.prototype.transferPhone = function() {
 		//电话转接
 	}
 	Phone.prototype.terminate = function() {
 		//电话挂断
-
+		this.ua.terminateSessions();
 	}
 	Phone.prototype.sendMessage = function(args, msg) {
 		if(!args) {
@@ -162,22 +244,13 @@ var phone = (function() {
 		var session = this.ua.sendMessage('sip:' + args + '@' + this._default.serverUrl, msg, options);
 	}
 
-	Phone.prototype.openVide = function(my, your) {
-		if(typeof my == "string") my = document.getElementById(my);
-		if(typeof your == "string") this.remoteVideo = document.getElementById(your);
-		var constraints = {
-			audio: true,
-			video: {
-				faceMode: 'user'
-			}
-		};
-		navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
-			my.srcObject = stream;
-			document.body.addEventListener('click', function() {
-				my.play();
-			});
+	Phone.prototype.openVide = function() {
+		navigator.mediaDevices.getUserMedia(this.constraints).then(function success(stream) {
+			//this.localAudio.srcObject = stream;
+			//this.localVideo.srcObject = stream;
+			this.localStream = stream;
 		}).catch(function(error) {
-			onError({
+			console.error({
 				name: error.name,
 				message: error.message
 			});

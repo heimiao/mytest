@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>sipjstest</title>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+		<input id="number" value="1001" type="text" />
+		<button id="startCall">拨打</button>
+		<button id="endCall">End Call</button>
+		<button id="transfer">盲转</button>
+		<button id="hold">hold</button>
+		<button id="unhold">unhold</button>
+		<br>
+		<input id="msg" value="你好" type="text" />
+		<button id="sendMessage">Send Message</button>
+		<div style="display:none">
+			<video autoplay>Video Disabled or Unavailable</video>
+			<audio autoplay>Video Disabled or Unavailable</audio>
+		</div>
+		<!-- DTMF -->
+		<div id="dtmf-buttons">
+			<button onclick="sendDtmf('1');">1</button>
+			<button onclick="sendDtmf('2');">2</button>
+			<button onclick="sendDtmf('3');">3</button>
+			<button onclick="sendDtmf('4');">4</button>
+			<button onclick="sendDtmf('5');">5</button>
+			<button onclick="sendDtmf('6');">6</button>
+			<button onclick="sendDtmf('7');">7</button>
+			<button onclick="sendDtmf('8');">8</button>
+			<button onclick="sendDtmf('9');">9</button>
+			<button onclick="sendDtmf('0');">0</button>
+			<button onclick="sendDtmf('#');">#</button>
+			<button onclick="sendDtmf('*');">*</button>
+		</div>
+		<script src="lib/sip-0.7.8.js"></script>
+		<script>
+			var config = {
+				uri: '1005@127.0.0.1',
+				ws_servers: 'wss://192.168.171.12:7443',
+				authorizationUser: '1005',
+				password: '1234'
+			};
+			var ua = new SIP.UA(config);
+
+			var sessionall;
+			var startCall = document.getElementById('startCall');
+			var endCall = document.getElementById('endCall');
+			var transfer = document.getElementById('transfer');
+			var hold = document.getElementById('hold');
+			var unhold = document.getElementById('unhold');
+			var sendMessage = document.getElementById('sendMessage');
+			// 接受入站（用户代理服务器）会话
+			ua.on('invite', function(session) {
+				var url = session.remoteIdentity.uri.toString() + "来电了，是否接听";
+				var isaccept = confirm(url);
+				if(isaccept) {
+					//接受来电
+					session.accept({
+						mediaConstraints: {
+							audio: true,
+							video: false
+						}
+					});
+					sessionall = session;
+				} else {
+					//拒绝来电
+					session.reject();
+				}
+
+			});
+			//拨打事件
+			myAddEvent(startCall, 'click', function() {
+				var number = document.getElementById("number").value;
+				//创建一个新的出站（用户代理客户端）会话
+				sessionall = ua.invite(number, {
+					mediaConstraints: {
+						audio: true,
+						video: false
+					}
+				});
+				//每次收到成功的最终（200-299）响应时都会触发。
+				sessionall.on("accepted", function(response, cause) {
+					
+					console.log(response);
+					var element = document.querySelector('video');
+					var element_audio = document.querySelector('audio');
+					var stream = this.mediaHandler.getRemoteStreams()[0];
+					if(typeof element.srcObject !== 'undefined') {
+						element_audio.srcObject = stream;
+					}
+				})
+				//挂机时会触发
+				sessionall.on("bye", function(response, cause) {
+					console.log(response);
+					alert(response.call_id);
+				})
+				//请求失败时触发，无论是由于最终响应失败，还是由于超时，传输或其他错误。
+				sessionall.on("failed", function(response, cause) {
+					console.log("拨打失败");
+				})
+			})
+			//挂断事件
+			myAddEvent(endCall, 'click', function() {
+				if(!sessionall) {
+					return;
+				} else if(sessionall.startTime) { // Connected
+					sessionall.bye();
+				} else if(sessionall.reject) { // Incoming
+					sessionall.reject();
+				} else if(sessionall.cancel) { // Outbound
+					sessionall.cancel();
+				}
+			})
+			//发送DTMF
+			function sendDtmf(num) {
+				sessionall.dtmf(num);
+			}
+			//电话转移盲转
+			myAddEvent(transfer, 'click', function() {
+				if(!sessionall) {
+					return;
+				}
+				var number = document.getElementById("number").value;
+				sessionall.refer(number);
+			})
+			//电话保持
+			myAddEvent(hold, 'click', function() {
+				if(!sessionall) {
+					return;
+				}
+				sessionall.hold();
+			})
+			//恢复电话保持
+			myAddEvent(unhold, 'click', function() {
+				if(!sessionall) {
+					return;
+				}
+				sessionall.unhold();
+			})
+			//发送消息
+			myAddEvent(sendMessage, 'click', function() {
+				// Sends a new message
+				var number = document.getElementById("number").value;
+				var message = document.getElementById("msg").value;
+				ua.message(number, message);
+				// When receiving a message, prints it out
+				ua.on('message', function(message) {
+					console.log(message.body);
+				});
+			})
+			/*公共通用方法obj为要绑定事件的元素，ev为要绑定的事件，fn为绑定事件的函数*/
+			function myAddEvent(obj, ev, fn) {
+				if(obj.attachEvent) {
+					obj.attachEvent("on" + ev, fn);
+				} else {
+					obj.addEventListener(ev, fn, false);
+				}
+			}
+		</script>
+
+	</body>
+
+</html>

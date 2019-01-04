@@ -10,8 +10,11 @@
 		<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
 		<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 		<script src="https://cdn.bootcss.com/adapterjs/0.15.3/adapter.min.js"></script>
-		<script src="lib/sip-0.12.0.min.js"></script>
-		<script src="" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/JsSIP/dist/jssip.js"></script>
+		<script>
+			//			JsSIP.debug.enable('JsSIP:*');
+			JsSIP.debug.disable('JsSIP:*');
+		</script>
 		<title>语音通信</title>
 		<style type="text/css">
 			video {
@@ -92,7 +95,7 @@
 			</div>
 		</div>
 		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
-		<script src="javascripts/phone_sip.js" type="text/javascript" charset="utf-8"></script>
+		<script src="javascripts/phone_jssip.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			function register() {
 				phone.register($("#myPhoneNum").val());
