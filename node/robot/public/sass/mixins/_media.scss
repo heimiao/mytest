@@ -1,0 +1,44 @@
+@import "mixins";
+//水平线颜色，图片大小，字体大小，字体宽度多少作为省略号，内容内间距
+@mixin medias($hrColor:grey, $imgSize:50px, $font-size:16px, $font-width:160px, $bg:#2E323A, $font-color:#fff) {
+    border-bottom: 1px solid $hrColor;
+    padding: 10px 15px;
+    margin-top: 0px;
+    cursor: pointer;
+    position: relative;
+    background: $bg;
+    img {
+        display: inline;
+        width: $imgSize;
+        height: $imgSize;
+        @include radius(5px);
+    }
+    .media-body {
+        h4,
+        p {
+            font-size: $font-size;
+            width: $font-width;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: $font-color;
+        }
+        p {
+            font-size: 14px;
+        }
+    }
+    .badge {
+        @include badge(red, 10px, 15px);
+    }
+    &.active,
+    &:active,
+    &:hover {
+        background-color: darken($bg, 5%);
+        .media-body {
+            h4,
+            p {
+                color: darken($font-color, 15%);
+            }
+        }
+    }
+}

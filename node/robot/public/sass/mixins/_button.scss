@@ -1,0 +1,121 @@
+@mixin data-btn(
+    $width:auto, 
+    $height:auto,
+    $background:#484f63, 
+    $color:#fff,
+    $radiu:auto, 
+    $border:auto
+    ) {
+    //如果不传参数就获取默认的值484f63
+    // @each $key,$value in $defaultBtn{
+    //     #{$key}:$value; 
+    // } 
+    @if $width=="auto" {
+        padding: 0 25px;
+    }
+    @else {
+        width: $width;
+    }
+    @if $height=="auto" {
+        line-height: 35px;
+    }
+    @else {
+        height: $height;
+        line-height: $height;
+    }
+    background: $background;
+    color: $color;
+    @if $radiu=="auto" {
+        @include radius(5px);
+    }
+    @else {
+        @include radius($radiu);
+    }
+    @if $border=="auto" {
+        border: 0;
+    }
+    @else {
+        border: $border;
+    }
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    @include line-gradient($background, darken($background, 10%));
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+    &:hover {
+        background: darken($background, 5%);
+        color: darken($color, 5%);
+    }
+    &:active {
+        background: darken($background, 15%);
+        color: darken($color, 8%);
+        outline: none;
+        text-decoration: none;
+        text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+        @include line-gradient($background, darken($background, 5%));
+        @include translate(-1px, 1px);
+    }
+    &:disabled {
+        background: #C0C0C4;
+        color: #EFEFEF;
+    }
+}
+
+@mixin btn($width:auto, $height:auto, $background:#484f63, $color:#FFFFFF, $radiu:auto, $border:auto) {
+    //如果不传参数就获取默认的值484f63
+    // @each $key,$value in $defaultBtn{
+    //     #{$key}:$value; 
+    // } 
+    @if $width=="auto" {
+        padding: 0 25px;
+    }
+    @else {
+        width: $width;
+    }
+    @if $height=="auto" {
+        line-height: 35px;
+    }
+    @else {
+        // height: $height;
+        line-height: $height;
+    }
+    background: $background;
+    color: $color;
+    @if $radiu=="auto" {
+        @include radius(5px);
+    }
+    @else {
+        @include radius($radiu);
+    }
+    @if $border=="auto" {
+        border: 0;
+    }
+    @else {
+        border: $border;
+    }
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+    &:hover {
+        @if $background!="transparent" {
+            background: darken($background, 5%);
+            color: darken($color, 5%);
+        }
+    }
+    &:active {
+        @if $background!="transparent" {
+            background: darken($background, 15%);
+            color: darken($color, 8%);
+        }
+        outline: none;
+        text-decoration: none;
+        text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+    }
+    &:disabled {
+        background: #C0C0C4;
+        color: #EFEFEF;
+    }
+}

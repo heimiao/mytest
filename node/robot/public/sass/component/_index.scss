@@ -1,0 +1,506 @@
+//导入模块样式
+@import "../mixins";
+@import "../mixins/button";
+.index-css {
+    width: 100%;
+    .mybtn {
+        background: #ef016c;
+        color: #fff;
+        cursor: pointer;
+    }
+    .top-container {
+        background: url('../img/bj.png');
+        .nav-container {
+            position: relative;
+            .my-nav {
+                border-bottom: 1px solid #6933AC;
+                position: absolute;
+                width: 100%;
+                margin: 0px -15px;
+                .navbar-toggler {
+                    color: #fff;
+                }
+                .navbar-brand {
+                    margin-right: 4rem;
+                }
+                .my-navbar-nav {
+                    .my-nav-link {
+                        color: #fff;
+                        font-size: 1.4rem;
+                        padding: 15px 25px;
+                    }
+                }
+                .my-btn {
+                    @extend .mybtn;
+                    margin-left: 22px;
+                }
+            }
+        }
+        .container-banner {
+            padding-top: 15%;
+            .banner-text {
+                text-align: center;
+                position: relative;
+                z-index: 2;
+                dl {
+                    max-width: 450px;
+                    margin: 0px auto;
+                    color: #fff;
+                    font-size: 2.4rem;
+                    dt {
+                        background: url("../img/Hexagon.png");
+                        padding: 35px 35px 0px 35px;
+                        background-size: 100%;
+                    }
+                    dd {
+                        margin-top: 5px;
+                        font-size: 1.8rem;
+                    }
+                    img {
+                        width: 30%;
+                        max-width: 117px;
+                    }
+                }
+                .my-btn {
+                    @extend.mybtn;
+                    margin: 2rem auto;
+                    padding: 10px 3rem;
+                }
+            }
+            >img {
+                width: 100%;
+                margin-top: -10%;
+                position: relative;
+                z-index: 1;
+            }
+        }
+        @media (max-width: 992px) {
+            .my-navbar-nav {
+                .my-nav-link {
+                    border-bottom: 1px solid #371359;
+                    &:hover {
+                        background: rgba(58, 29, 92, 1);
+                    }
+                }
+            }
+            .my-collapse {
+                background: rgba(105, 51, 172, 1);
+                z-index: 10
+            }
+            .container-banner {
+                padding-top: 20%;
+            }
+        }
+    }
+    .second-plate {
+        //第二板块
+        margin: 5rem auto;
+        text-align: center;
+        .title {
+            margin-bottom: 3rem;
+            font-size: 2.4rem;
+            color: #000;
+            font-weight: bold;
+            small {
+                font-size: 1.4rem;
+                color: #666;
+            }
+        }
+        .my-card {
+            background: url("../img/photo.png")-15px -11px;
+            width: 100%;
+            max-width: 240px;
+            margin: 0px auto;
+            @include shadow(0px 2px 20px 1px rgba(0,
+            0,
+            0,
+            .3));
+            dl {
+                height: 320px;
+                img {
+                    cursor: pointer
+                }
+                dt {
+                    height: 80%;
+                    display: -webkit-flex;
+                    display: flex;
+                    flex-direction: column;
+                    .my-card-body {
+                        flex: 1;
+                        display: flex;
+                        display: -webkit-flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: flex-end;
+                    }
+                    h1 {
+                        flex-basis: 30px;
+                        height: 50px;
+                        font-size: 1.8rem;
+                        color: #f7633c;
+                    }
+                }
+                dd {
+                    text-align: left;
+                    padding: 0px 15px;
+                }
+            }
+        }
+        .index_2 {
+            background-position-x: 796px;
+            dl {
+                dd {
+                    color: #fff
+                }
+            }
+        }
+        .index_3 {
+            background-position-x: 526px;
+            dl {
+                dd {
+                    color: #fff
+                }
+            }
+        }
+        .index_4 {
+            background-position-x: 258px;
+            dl {
+                dd {
+                    color: #fff
+                }
+            }
+        }
+    }
+    @media (max-width: 992px) {
+        .second-plate {
+            margin: 3rem auto;
+            .title {
+                margin-bottom: 2rem;
+                font-size: 1.6rem;
+                small {
+                    font-size: 1.2rem;
+                }
+            }
+            .my-card {
+                dl {
+                    height: 280px;
+                    dt {
+                        height: 70%;
+                    }
+                    dd {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+        }
+    }
+    .third-plate {
+        text-align: center;
+        background: url("../img/bj-2.png");
+        color: #fff;
+        padding: 25px 0px;
+        .container {
+            .title {
+                color: #fff;
+                margin-bottom: 15px;
+                dl {
+                    &:before {
+                        display: inline-block;
+                        content: url("../img/Hexagon-2.png");
+                        width: 80px;
+                        position: absolute;
+                        top: -25px;
+                        left: -88px;
+                    }
+                    position:relative;
+                    display: inline-block;
+                    text-align: left;
+                    margin: 0px;
+                    dt {
+                        font-size: 2.4rem;
+                    }
+                    dd {
+                        font-size: 1.4rem;
+                        color: #999;
+                        margin-top: 10px;
+                    }
+                }
+            }
+            .radar-text {
+                text-align: left;
+                .small {
+                    display: none;
+                }
+                .big {
+                    display: block;
+                }
+                .dl {
+                    max-width: 370px;
+                    margin: 0px auto;
+                    dt {
+                        font-size: 1.8rem;
+                        .icon {
+                            position: relative;
+                            display: inline;
+                            &:before {
+                                position: absolute;
+                                content: url("../img/Hexagon-2.png");
+                                top: -50px;
+                                left: -55px;
+                                z-index: 0;
+                            }
+                            >span {
+                                position: relative;
+                                z-index: 1;
+                            }
+                        }
+                    }
+                    .rt {
+                        text-align: right;
+                    }
+                    dd {
+                        font-size: 1.2rem;
+                        margin-top: 6px;
+                        color: #999;
+                    }
+                }
+                .radar-container {
+                    width: 90%;
+                    margin: 0px auto;
+                    max-width: 657px;
+                    position: relative;
+                    >img {
+                        width: 100%;
+                    }
+                    .index {
+                        position: absolute;
+                        width: 150px;
+                        height: 70px;
+                        dl {
+                            display: inline-block;
+                            vertical-align: middle;
+                            dt {
+                                font-size: 2.4rem;
+                            }
+                            dd {
+                                font-size: 1.4rem;
+                                margin: 0px
+                            }
+                        }
+                    }
+                    .index-1 {
+                        top: -70px;
+                        right: 50%;
+                        margin-right: -75px;
+                    }
+                    .index-2 {
+                        top: 5%;
+                        right: -75px;
+                    }
+                    .index-3 {
+                        top: 50%;
+                        right: -150px;
+                    }
+                    .index-4 {
+                        right: 50%;
+                        bottom: -70px;
+                        margin-right: -75px;
+                    }
+                    .index-5 {
+                        top: 50%;
+                        left: -150px;
+                    }
+                    .index-6 {
+                        top: 5%;
+                        left: -75px;
+                    }
+                }
+            }
+        }
+    }
+    @media (max-width: 992px) {
+        .third-plate {
+            margin: 3rem auto;
+            background: url("../img/phone_bj-2.png");
+            .container {
+                .title {
+                    dl {
+                        //padding-left: 88px;
+                        margin-left: 88px;
+                        dt {
+                            max-width: 230px;
+                            font-size: 1.6rem;
+                        }
+                    }
+                }
+                .radar-text {
+                    .small {
+                        display: block;
+                        text-align: center;
+                        margin-top: 35px;
+                        img {
+                            width: 100%;
+                            max-width: 540px;
+                        }
+                    }
+                    .big {
+                        display: none
+                    }
+                    .dl {
+                        width: 100%;
+                        max-width: 370px;
+                        margin: 25px auto;
+                        padding-left: 55px;
+                        dt {
+                            font-size: 1.5rem;
+                        }
+                        .rt {
+                            text-align: left;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .fourth-plate {
+        @extend .second-plate;
+        dl {
+            width: 100%;
+            max-width: 170px;
+            margin: 0px auto;
+            dt {
+                color: #f7633c;
+                font-size: 1.6rem;
+                hr {
+                    width: 25px;
+                    margin: 5px auto;
+                    background: #ccd1d2;
+                    height: 1px;
+                }
+            }
+        }
+    }
+    .fifth-plate {
+        @extend .second-plate;
+        @extend .third-plate;
+        background: url("../img/bj-3.png");
+        img {
+            max-width: 971px;
+            width: 95%;
+        }
+        .container {
+            .title {
+                dl {
+                    &:before {
+                        top: -50px;
+                        left: -80px;
+                    }
+                    margin-bottom:20px;
+                }
+                >small {
+                    color: #999;
+                }
+            }
+        }
+        .big {
+            display: block;
+        }
+        .small {
+            display: none;
+        }
+    }
+    @media (max-width: 992px) {
+        .fifth-plate {
+            background: url("../img/phone_bj-3.png");
+            .big {
+                display: none;
+            }
+            .small {
+                display: block;
+            }
+        }
+    }
+    .sixth-plate {
+        @extend .second-plate;
+        .media {
+            text-align: left;
+            width: 100%;
+            //max-width:385px;
+            margin: 10px auto;
+            min-height: 121px;
+            padding: 10px;
+            @include shadow(0px 2px 20px 1px rgba(0,
+            0,
+            0,
+            .1));
+            @include radius(5);
+            .media-body {
+                h5 {
+                    color: #f7633c;
+                    font-size: 1.6rem;
+                }
+            }
+        }
+    }
+    .footer {
+        width: 100%;
+        text-align: center;
+        line-height: 50px;
+        color: #fff;
+        background: #000;
+    }
+}
+
+////////////提交表单样式
+.myform {
+    margin: 0px auto;
+    width: 93%;
+    text-align: center;
+    h1 {
+        font-size: 1.8rem;
+        color: #000;
+        text-align: center;
+        font-weight: bold;
+        margin: -10px auto;
+        &:before {
+            display: inline-block;
+            content: url("../img/Hexagon-2.png");
+            vertical-align: middle;
+            margin-right: -40px;
+        }
+    }
+    label {
+        text-align: left;
+    }
+    .form-group {
+        text-align: left
+    }
+    .error {
+        color: red;
+        text-align: left;
+    }
+    .btn-default {
+        background: #fff;
+        border: 1px solid #ef016c;
+        color: #ef016c;
+        width: 40%;
+        outline: none;
+        margin-top: 15px;
+    }
+    .btn-primary {
+        background: #ef016c;
+        width: 40%;
+        color: #fff;
+        outline: none;
+        border: 0px;
+        margin-top: 15px;
+    }
+    .btn-primary:disabled {
+        background: grey;
+    }
+    .footer {
+        margin-top: 35px;
+        color: #b5b5b5;
+        font-size: 1.2rem;
+    }
+}

@@ -1,0 +1,79 @@
+@mixin message() {
+    .he-group,
+    .me-group {
+        margin-top: 25px;
+        padding: 10px;
+        .msg {
+            position: relative;
+            //border: 1px solid red;
+            max-width: calc(100% - 70px);
+            .baseInfo {
+                position: absolute;
+                top: -25px;
+                width: 174px;
+                margin: 0px 10px;
+            }
+            pre.cont {
+                background: #9EEA6A;
+                margin: 0px 10px;
+                padding: 10px;
+                white-space: pre-wrap;
+                word-break: normal;
+                position: relative;
+                overflow: visible;
+                &:before,
+                &:after {
+                    position: absolute;
+                    top: 10px;
+                    display: inline-block;
+                    content: "";
+                    width: 0;
+                    height: 0;
+                }
+            }
+        }
+        .head-img {
+            width: 45px;
+            height: 45px;
+            @include radius(5px);
+        }
+    }
+    .he-group {
+        .msg {
+            float: left;
+            .baseInfo {
+                left: 0px;
+            }
+            pre.cont {
+                &:before {
+                    left: -10px;
+                    border-top: 10px solid transparent;
+                    border-bottom: 10px solid transparent;
+                    border-right: 10px solid #9EEA6A;
+                }
+            }
+        }
+        .head-img {
+            float: left;
+        }
+    }
+    .me-group {
+        .msg {
+            float: right;
+            .baseInfo {
+                right: 0px;
+            }
+            pre.cont {
+                &:after {
+                    right: -10px;
+                    border-top: 10px solid transparent;
+                    border-bottom: 10px solid transparent;
+                    border-left: 10px solid #9EEA6A;
+                }
+            }
+        }
+        .head-img {
+            float: right;
+        }
+    }
+}

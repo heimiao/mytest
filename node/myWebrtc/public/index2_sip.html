@@ -4,11 +4,11 @@
 	<head>
 		<meta charset="utf-8">
 		<title>sipjstest</title>
-		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="stylesheets/style.css" />
 	</head>
 
 	<body>
-		<input id="number" value="1001" type="text" />
+		<input id="number" value="1006" type="text" />
 		<button id="startCall">拨打</button>
 		<button id="endCall">End Call</button>
 		<button id="transfer">盲转</button>
@@ -19,7 +19,8 @@
 		<button id="sendMessage">Send Message</button>
 		<div style="display:none">
 			<video autoplay>Video Disabled or Unavailable</video>
-			<audio autoplay>Video Disabled or Unavailable</audio>
+			<audio id="remoteAudio" autoplay>Video Disabled or Unavailable</audio>
+			<audio id="localVideo" autoplay>Video Disabled or Unavailable</audio>
 		</div>
 		<!-- DTMF -->
 		<div id="dtmf-buttons">
@@ -36,12 +37,25 @@
 			<button onclick="sendDtmf('#');">#</button>
 			<button onclick="sendDtmf('*');">*</button>
 		</div>
-		<script src="lib/sip-0.7.8.js"></script>
+		<!--<script src="lib/sip-0.7.8.js"></script>-->
+		<script src="lib/sip-0.12.0.min.js"></script>
 		<script>
+			function getQueryString(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+				var r = window.location.search.substr(1).match(reg);
+				if(r != null) return unescape(r[2]);
+				return null;
+			}
+
+			var phoneNum = getQueryString("phone") ? getQueryString("phone") : '1000';
+			alert(phoneNum);
 			var config = {
-				uri: '1005@127.0.0.1',
-				ws_servers: 'wss://192.168.171.12:7443',
-				authorizationUser: '1005',
+				uri: phoneNum + '@192.168.171.12',
+				transportOptions: {
+					wsServers: ['wss://192.168.171.12:7443']
+				},
+				authorizationUser: phoneNum,
+				traceSip: true,
 				password: '1234'
 			};
 			var ua = new SIP.UA(config);
@@ -69,6 +83,7 @@
 				} else {
 					//拒绝来电
 					session.reject();
+					session.terminate();
 				}
 
 			});
@@ -84,11 +99,11 @@
 				});
 				//每次收到成功的最终（200-299）响应时都会触发。
 				sessionall.on("accepted", function(response, cause) {
-					
 					console.log(response);
 					var element = document.querySelector('video');
 					var element_audio = document.querySelector('audio');
 					var stream = this.mediaHandler.getRemoteStreams()[0];
+
 					if(typeof element.srcObject !== 'undefined') {
 						element_audio.srcObject = stream;
 					}

@@ -2,7 +2,7 @@
 
 let nextTodoId = 0
 //给添加按钮准备的action
-export const addTodo = (text) => {
+export const addTodo = text => {
     type: 'addAll',
     id: nextTodoId++,
     text

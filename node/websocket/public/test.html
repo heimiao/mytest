@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+		<title>接听电话</title>
+		<!-- Bootstrap -->
+		<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
+		<!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
+		<!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row dt-call">
+				<div class="col-xs-6 show-call-info">
+					<div class=""></div>
+					<button class="btn btn-info getStream">获取音频流</button>
+					<button class="btn btn-success startRecord">开始录音</button>
+					<button class="btn btn-warning stopRecord">停止录音</button>
+					<button class="btn btn-success clearRecord">清除录音</button>
+					<button class="btn btn-success  playRecord">播放录音</button>
+					<h3>服务器发过来的所有东东</h3>
+					<div class="showImg">1231</div>
+					<h3>客户端发送的东东</h3>
+					<div class="showImg-clit">1231</div>
+					<textarea class="form-control send"></textarea>
+					<button class="btn btn-success  sendImg" onclick="sendImg()">发消息</button>
+				</div>
+				<div class="col-xs-6 dt-call-record">
+					<h3>机器人和客户对话列表</h3>
+				</div>
+			</div>
+			<audio id="remoteAudio" autoplay="autoplay" controls="controls"></audio>
+		</div>
+
+		<script src="lib/jquery.min.js"></script>
+		<script src="lib/recorder.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<script src="lib/socket.io.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			if("WebSocket" in window) {
+				//var wsServer = 'wss://192.168.29.58:8443/websocket/chat'; //服务器地址
+				var wsServer = 'wss://192.168.29.100:8000'; //服务器地址
+				var websocket = new WebSocket(wsServer); //创建WebSocket对象 
+				websocket.onopen = function(evt) {
+					//已经建立连接
+					//websocket.send("hello"); //向服务器发送消息
+					
+				};
+				websocket.onclose = function(evt) {
+					//已经关闭连接
+					console.log(evt);
+				};
+				websocket.onmessage = function(evt) {
+					//收到服务器消息，使用evt.data提取
+					console.log(evt);
+					var test = document.createElement("div").innerHTML = evt.data;
+					$(".showImg").html(test)
+
+				};
+				websocket.onerror = function(evt) {
+					//产生异常
+					console.error(evt)
+				};
+				console.log("websocket状态      "+websocket.readyState); //查看websocket当前状态
+			} else {
+				$.danger("不支持websocket建立，请更新更高版本的浏览器")
+			}
+
+			function sendImg() {
+				var data = $(".send").val() || "默认数据"
+				var test = document.createElement("div").innerHTML = data;
+				$(".howImg-clit").append(test);
+				websocket.send(data); //向服务器发送消息
+			}
+
+			var mediaStreamTrack = null;
+
+			function getStream() {
+				var audio_context = null;
+				try {
+					// webkit shim
+					window.AudioContext = window.AudioContext || window.webkitAudioContext;
+					navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+					window.URL = window.URL || window.webkitURL;
+					audio_context = new AudioContext;
+				} catch(e) {
+					messages("您的浏览器不支持语音采集，请切换更高版本浏览器");
+				}
+				navigator.mediaDevices.getUserMedia({
+					audio: true,
+					video: false,
+				}).then(function success(stream) {
+					//document.getElementById("remoteAudio").srcObject = stream;
+					mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[0];
+					//stream = stream;
+					var inputStream = audio_context.createMediaStreamSource(stream);
+					inputStream.context.sampleRate = 16000;
+					recorder = new Recorder(inputStream);
+					console.log("获取媒体流");
+				}).catch(function(err) {
+					console.error("获取本地媒体流错误" + err);
+				});
+
+			}
+
+			function startRecord() {
+
+				$.dialog("来电话了是否要接通?", () => {
+					console.log("接通电话");
+					console.log("开始录音");
+					recorder && recorder.record();
+				}, () => {
+					console.log("拒绝电话");
+				})
+			}
+
+			function stopRecord() {
+				console.log("停止录音");
+				/*if(stream.stop) {
+					stream.stop();
+				} else {
+					var tracks = stream.getTracks();
+					for(var i = 0; i < tracks.length; i++) {
+						tracks[i].stop();
+					}
+				}*/
+				console.log(mediaStreamTrack);
+				mediaStreamTrack && mediaStreamTrack.stop();
+				recorder && recorder.stop();
+			}
+
+			function clearRecord() {
+				console.log("清除录音");
+				recorder && recorder.clear();
+			}
+
+			function playRecord() {
+				console.log("播放录音");
+				recorder && recorder.exportWAV(blob => {
+					console.log(blob);
+					var audioUrl = window.URL.createObjectURL(blob)
+					document.getElementById("remoteAudio").src = blob;
+					setTimeout(audioUrl => window.URL.revokeObjectURL(audioUrl), "2000");
+				})
+			}
+
+			var getStreamBtn = $(".getStream");
+			var startRecordBtn = $(".startRecord");
+			var stopRecordBtn = $(".stopRecord");
+			var clearRecordBtn = $(".clearRecord");
+			var playRecordBtn = $(".playRecord");
+
+			getStreamBtn.click(e => {
+				getStream()
+			})
+			startRecordBtn.click(e => {
+				getStream()
+				startRecord()
+			})
+			stopRecordBtn.click(e => {
+				stopRecord()
+			})
+			clearRecordBtn.click(e => {
+				clearRecord()
+			})
+			playRecordBtn.click(e => {
+				playRecord();
+			})
+		</script>
+	</body>
+
+</html>

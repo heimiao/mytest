@@ -10,12 +10,18 @@
 			}
 		</style>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+		<script src="https://cdn.bootcss.com/require.js/2.3.6/require.min.js"></script>
 	</head>
 
 	<body>
-		<h3>显示文本</h3>
+		<h3>简单的路由</h3>
 		<div id="app">
-			{{ message }}
+			<div class="menu">
+				<router-link to="/foo/12">菜单一</router-link>
+				<router-link to="/bar">菜单二</router-link>
+			</div>
+			<router-view></router-view>
 		</div>
 		<h3>绑定属性</h3>
 		<div class="app-2">
@@ -69,12 +75,24 @@
 			</ol>
 		</div>
 		<script type="text/javascript">
-			var app = new Vue({
-				el: '#app',
-				data: {
-					message: 'Hello Vue!'
+			 
+			const routes = [{
+					path: '/foo/:id',
+					component: {
+						template: '<div>{{$route.params.id}}</div>'
+					}
+				},
+				{
+					path: '/bar', 
 				}
+			]
+			const router = new VueRouter({
+				routes
 			})
+			var app = new Vue({
+				router,
+			}).$mount('#app')
+
 			var app2 = new Vue({
 				el: '.app-2',
 				data: {
@@ -164,9 +182,7 @@
 			})
 		</script>
 		<style type="text/css">
-			a{
-				 
-			}
+			a {}
 		</style>
 	</body>
 

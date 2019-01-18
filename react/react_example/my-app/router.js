@@ -5,7 +5,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, IndexRedirect, browserHistory } from 'react-router'
-import process from 'nprogress'
+import process from 'nprogress' 
 import auth from 'public/auth'
 import App from './functions/App'
 
@@ -40,7 +40,9 @@ export default render((
       onChange={() => process.start()}
       component={App}
      >
+
       <IndexRedirect to="/overview/todos" />
+
       <Route path="overview">
         <Route path="todos" getComponent={(location, cb) => {
           require.ensure([], require => {

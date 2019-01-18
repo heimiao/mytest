@@ -1,0 +1,424 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="./css/callcenter-component.css">
+    <style type="text/css">
+        table {
+            border: 1px;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        table th {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: center;
+        }
+
+        table tbody td {
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<table>
+    <caption>
+        历史弹屏
+    </caption>
+    <thead>
+    <th>客户号码</th>
+    <th>通话类型</th>
+    <th>客服姓名</th>
+    <th>客服ID</th>
+    <th>来源队列</th>
+    <th>通话记录ID</th>
+    <th>归属地</th>
+    <th>振铃时间</th>
+    <th>Call ID</th>
+    <th>是否挂断</th>
+    </thead>
+    <tbody id="screen-pop-history">
+
+    </tbody>
+</table>
+<p>
+    <button onclick="destroyCallComponent();">销毁通话组件</button>
+    <button onclick="createCallComponent();">创建通话组件</button>
+</p>
+<h3>修改客服状态</h3>
+<div>
+    <button onclick="setWorkStatus('idle');">空闲</button>
+    <button onclick="setWorkStatus('busy');">忙碌</button>
+    <button onclick="setWorkStatus('resting');">小休</button>
+    <button onclick="setWorkStatus('offline');">离线</button>
+</div>
+<h3>修改客服在线方式</h3>
+<div>
+    <button onclick="setWorkingWay('fixed_voip_online');">IP话机</button>
+    <button onclick="setWorkingWay('phone_online');">手机</button>
+    <button onclick="setWorkingWay('voip_online');">网页电话</button>
+</div>
+<h3>修改中继号</h3>
+<div>
+    <p>获取中继号时,务必保持initdata接口初始化成功,未成功时只有一个id为null的默认项</p>
+    <input id="call_number_id" placeholder="中继号ID"/>
+    <button onclick="getCallNumbers();">获取中继号</button>
+    <button onclick="setupDefaultNumber();">修改中继号</button>
+</div>
+<h3>保持/取回 通话</h3>
+<div>
+    <button onclick="holdCallSelect();">保持通话</button>
+    <button onclick="recoveryCallSelect();">取回通话</button>
+</div>
+<h3>挂断</h3>
+<div>
+    <button onclick="callComp.hangup();">挂断</button>
+</div>
+<h3>高级通话</h3>
+<input id="agent_id" placeholder="客服ID"/>
+<div>
+    <button onclick="transfer();">转接</button>
+    <button onclick="startConsult();">咨询</button>
+    <button onclick="stopConsult();">结束咨询</button>
+    <button onclick="startThreeWayCalling();">三方</button>
+</div>
+<h3>转接IVR</h3>
+<input id="node_id" placeholder="节点id"/>
+<select id="type">
+    <option value="agent_hold">转接后等待</option>
+    <option value="agent_hangup">转接后挂机</option>
+</select>
+<div>
+    <button onclick="startIvrCalling();">转接ivr</button>
+</div>
+<h3>测试自动外呼任务客户号码组存储</h3>
+<div>
+    <button onclick="getAutomaticCallNumGroup();">测试</button>
+</div>
+<h3>监控-修改客服状态</h3>
+<input id="monitor_workStatus_id" placeholder="客服ID"/>
+<div>
+    <button onclick="setMonitorWorkStatus('idle');">空闲</button>
+    <button onclick="setMonitorWorkStatus('busy');">忙碌</button>
+    <button onclick="setMonitorWorkStatus('offline');">离线</button>
+</div>
+<div>
+    <p>如果在小休的的输入框中,输入了自定义小休的id那么切换到自定义小休的状态</p>
+    <input id="resting_id" placeholder="小休ID"/>
+    <button onclick="setMonitorWorkStatus('resting');">小休</button>
+</div>
+<h3>监控-切换客服在线方式</h3>
+<input id="monitor_workingWay_id" placeholder="客服ID"/>
+<div>
+    <button onclick="setMonitorAgentWorkWay('fixed_voip_online');">IP话机</button>
+    <button onclick="setMonitorAgentWorkWay('phone_online');">手机</button>
+    <button onclick="setMonitorAgentWorkWay('voip_online');">网页电话</button>
+</div>
+<h3>监控-高级通话</h3>
+<input id="monitor_agent_id" placeholder="客服ID"/>
+<div>
+    <button onclick="monitorAgentListeing();">监听</button>
+    <button onclick="monitorAgentInterpose();">强插</button>
+    <button onclick="monitorAgentSubstitute();">拦截</button>
+</div>
+
+<script src="./js/callcenter-component.js"></script>
+<script src="./js/call-api.js"></script>
+<script>
+    var token = 'xxxx';
+    var subDomain = 'xxxxx';
+    var onTokenExpired = function(callback) {
+        setTimeout(function() {
+            callback('xxxx');
+        }, 1000);
+    }
+    window.callAPI.tokenInit(
+        token,
+        subDomain,
+        onTokenExpired
+    )
+    var tbody = document.getElementById('screen-pop-history');
+
+    function createCallComponent() {
+        if (window.callComp && !window.callComp.isDestroyed) {
+            return;
+        }
+        window.callComp = new UdeskCallcenterComponent({
+            container: document.body,
+            token: token, // 客服token
+            subDomain: subDomain, // 您在udesk注册的二级域名,例如您的udesk域名是sample.udesk.cn,则此处填写sample
+            showManualScreenPop: true,
+            onScreenPop: function(conversation) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><a href="javascript:;" onclick="makeCall(\'' + conversation.customer_phone_number + '\')">' +
+                    conversation.customer_phone_number + '</a></td>' +   //客户电话
+                    '<td>' + conversation.call_type + '</td>' + //呼入、呼出
+                    '<td>' + conversation.agent_name + '</td>' +  //客服姓名
+                    '<td>' + conversation.agent_id + '</td>' +  //客服ID
+                    '<td>' + (conversation.queue_name || '') + '</td>' +  //队列，仅呼入有值，呼出值为null
+                    '<td>' + conversation.conversation_id + '</td>' +  //conversation_id
+                    '<td>' + conversation.customer_phone_location + '</td>' + //客户手机号归属地
+                    '<td>' + conversation.ring_time + '</td>' + //振铃时间
+                    '<td>' + conversation.call_id + '</td>' +   //call_id
+                    '<td id="' + conversation.conversation_id + '"></td>';
+
+                tbody.prepend(tr);
+            },
+            onHangup: function(conversation) {
+                document.getElementById(conversation.conversation_id).innerText = '已挂断';
+                console.log('hangup', conversation);
+            },
+            onWorkStatusChange: function(status) {
+                console.log('客服当前状态:' + status);
+            },
+            onWorkWayChange: function(way) {
+                console.log('客服当前在线方式:' + way);
+            },
+            onDropCall: function(res) {
+                console.log('挂断结果：' + res.error_message);
+            },
+            onTransferResult: function(res) {
+                console.log('转接结果', JSON.stringify(res));
+            },
+            onConsultResult: function(res) {
+                console.log('咨询结果', JSON.stringify(res));
+            },
+            onThreeWayCallingResult: function(res) {
+                console.log('三方结果', JSON.stringify(res));
+            },
+            onTokenExpired: onTokenExpired ,
+            onIvrCallResult: function(res) {
+                console.log('ivr转回结果', JSON.stringify(res));
+            },
+            onResumeAgentResult: function(res) {
+                console.log('ivr转回结果', JSON.stringify(res));
+            }
+            //            onInitSuccess: function() {
+            //                console.log('初始化成功');
+            //            },
+            //            onInitFailure: function() {
+            //                console.log('初始化失败');
+            //            }
+        });
+    }
+
+    function makeCall(phone_number) {
+        callComp.makeCall(phone_number, function() {
+            console.log('外呼成功');
+        }, function() {
+            console.log('外呼失败');
+        });
+    }
+
+    function destroyCallComponent() {
+        window.callComp.destroy();
+        window.callComp = null;
+    }
+
+    function setWorkStatus(status) {
+        if (window.callComp) {
+            window.callComp.setWorkStatus(status, function() {
+                console.log('修改状态成功');
+            }, function() {
+                console.log('修改状态失败');
+            });
+        }
+    }
+
+    function holdCallSelect() {
+        var targetId = document.getElementById('agent_id').value;
+        if (window.callComp) {
+            window.callComp.holdCallSelect(function() {
+                console.log('正在保持通话...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        } else {
+            alert('请先创建通话组件');
+        }
+    }
+
+    function recoveryCallSelect() {
+        var targetId = document.getElementById('agent_id').value;
+        if (window.callComp) {
+            window.callComp.recoveryCallSelect(function() {
+                console.log('正在取回通话...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        } else {
+            alert('请先创建通话组件');
+        }
+    }
+
+    function transfer() {
+        var targetId = document.getElementById('agent_id').value;
+        if (window.callComp) {
+            window.callComp.transfer(targetId, function() {
+                console.log('正在尝试转接...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        } else {
+            alert('请先创建通话组件');
+        }
+    }
+
+    function startConsult() {
+        var targetId = document.getElementById('agent_id').value;
+        if (window.callComp) {
+            window.callComp.startConsult(targetId, function() {
+                console.log('正在尝试咨询...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+
+    function stopConsult() {
+        if (window.callComp) {
+            window.callComp.stopConsult(function() {
+                console.log('正在结束咨询...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+
+    function startThreeWayCalling() {
+        var targetId = document.getElementById('agent_id').value;
+        if (window.callComp) {
+            window.callComp.startThreeWayCalling(targetId, function() {
+                console.log('正在尝试发起三方通话...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+
+    function startIvrCalling() {
+        var targetId = document.getElementById('node_id').value;
+        var type = document.getElementById('type').value;
+        var node = {
+            transfer_mode: type,
+            id: targetId
+        };
+        if (window.callComp) {
+            window.callComp.startIvrCalling(node, function() {
+                console.log('正在尝试转接ivr...');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+
+    function setWorkingWay(workingWay) {
+        if (callComp) {
+            callComp.setWorkingWay(workingWay, function() {
+                console.log('正在尝试修改客服在线方式');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+    function setupDefaultNumber() {
+        var callNumberId = document.getElementById('call_number_id').value;
+        if (callComp) {
+            callComp.setupDefaultNumber(callNumberId, function(res) {
+                console.log('正在尝试修改中继号');
+                alert(JSON.stringify(res));
+            }, function(res) {
+                alert(JSON.stringify(res));
+            });
+        }
+    }
+
+    function getAutomaticCallNumGroup() {
+        if (callComp) {
+            var cc_ad_task = callComp.getAutomaticCallNumGroup()
+            if(cc_ad_task){
+                alert(JSON.stringify(cc_ad_task));
+            }else{
+                alert('还没有储存自动外呼任务的客户号码组')
+            }
+        }
+    }
+
+    function getCallNumbers() {
+        if (callComp) {
+            var call_numbers = callComp.getCallNumbers()
+            alert(JSON.stringify(call_numbers));
+        }
+    }
+
+    function setMonitorWorkStatus(agent_work_state) {
+        if (callComp && callAPI) {
+            var resting_id = document.getElementById('resting_id').value;
+            var anget_id = document.getElementById('monitor_workStatus_id').value;
+            if(agent_work_state === 'resting' && resting_id.length !== 0){
+                callAPI.setMonitorWorkRestingStatus(anget_id,resting_id,function() {
+                    console.log('正在尝试修改其他客服状态')
+                },function(res) {
+                    alert(JSON.stringify(res));
+                })
+            }else {
+                callAPI.setMonitorWorkStatus(anget_id,agent_work_state,function() {
+                    console.log('正在尝试修改其他客服状态')
+                },function(res) {
+                    alert(JSON.stringify(res));
+                })
+            }
+        }
+    }
+    function setMonitorAgentWorkWay(agent_work_way) {
+        if (callComp && callAPI) {
+            var anget_id = document.getElementById('monitor_workingWay_id').value;
+            callAPI.setMonitorAgentWorkWay(anget_id,agent_work_way,function() {
+                console.log('正在尝试修改其他客服设备状态');
+            },function(res) {
+                alert(JSON.stringify(res));
+            })
+        }
+    }
+    function monitorAgentListeing() {
+        if (callComp && callAPI) {
+            var agent_id = document.getElementById('monitor_agent_id').value;
+            callAPI.monitorAgentListeing(agent_id,function() {
+                console.log('正在尝试监听');
+            },function(res) {
+                alert(JSON.stringify(res));
+            })
+        }
+    }
+    function monitorAgentInterpose() {
+        if (callComp && callAPI) {
+            var agent_id = document.getElementById('monitor_agent_id').value;
+            callAPI.monitorAgentInterpose(agent_id,function() {
+                console.log('正在尝试强插');
+            },function(res) {
+                alert(JSON.stringify(res));
+            })
+        }
+    }
+    function monitorAgentSubstitute() {
+        if (callComp && callAPI) {
+            var agent_id = document.getElementById('monitor_agent_id').value;
+            callAPI.monitorAgentSubstitute(agent_id, function() {
+                console.log('正在尝试拦截');
+            }, function(res) {
+                alert(JSON.stringify(res));
+            })
+        }
+    }
+
+
+</script>
+</body>
+</html>

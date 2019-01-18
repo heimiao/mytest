@@ -1,0 +1,15 @@
+ .my-modal {
+     .modal-content {
+         background: transparent;
+         .my-modal-header {
+             padding: 0px;
+             img {
+                 width: 100%;
+             }
+         }
+         .modal-body {
+             background: #fff;
+             padding-bottom: 25px;
+         }
+     }
+ }

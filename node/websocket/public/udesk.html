@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Udesk</title>
+		<!--  引入css-->
+		<link rel="stylesheet" type="text/css" href="lib/dist/css/callcenter-component.css">
+		<!--  引入js-->
+		<script src='lib/dist/js/callcenter-component.js'></script>
+		<script src="lib/dist/js/call-api.js"></script>
+		<!--<script src="lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>-->
+	</head>
+
+	<body>
+		<div class="dist">
+
+		</div>
+		<script>
+			function loadXMLDoc() {
+				var xmlhttp;
+				if(window.XMLHttpRequest) xmlhttp = new XMLHttpRequest();
+				else xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlhttp.onreadystatechange = function() {
+					if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						console.log(xmlhttp.responseText);
+						/*var callComponent = new UdeskCallcenterComponent({
+							container: document.querySelector(".dist"), //组件的容器
+							token: 'xxxxxxxx', //通过登录接口获取的客服token
+							subDomain: 'demo', //在udesk注册的二级域名，例如登录地址是demo.udesk.cn，这里填demo
+							showManualScreenPop: true, //是否开启‘手动弹屏’功能
+							onScreenPop: function(conversation) {}, //弹屏事件触发的方法
+							onHangup: function(conversation) {}
+						});*/
+					}else{
+						
+					}
+				}
+				xmlhttp.open("GET", "/login", true);
+				xmlhttp.send();
+			}
+			
+			loadXMLDoc();
+		</script>
+	</body>
+
+</html>

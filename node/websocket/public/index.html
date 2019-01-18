@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+		<title>接听电话</title>
+		<!-- Bootstrap -->
+		<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
+		<!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
+		<!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+		<link rel="stylesheet" type="text/css" href="css/index_sass.css" />
+	</head>
+
+	<body>
+		<div class="login">
+			<img src="images/logo-4.png" />
+		</div>
+
+		<div class="my-container">
+			<div class="phone-title"></div>
+			<div class="flex-parent dt-call">
+				<div class="flex-child call-info">
+					<audio id="remoteAudio" autoplay="autoplay" controls="controls"></audio>
+					<div class=""><img src="images/logo.png" /></div>
+					<div>
+						<button class="btn btn-info getStream">获取音频流</button>
+						<button class="btn btn-success startRecord">开始录音</button>
+						<button class="btn btn-warning stopRecord">停止录音</button>
+						<button class="btn btn-success clearRecord">清除录音</button>
+						<button class="btn btn-success  playRecord">播放录音</button>
+						<button class="btn btn-success" onclick="answer()">接听</button>
+						<button class="btn btn-success" onclick="hangup()">挂断</button>
+					</div>
+				</div>
+				<div class="flex-child call-record">
+					<div class="record-title">
+						<h4>客户通话详情</h4>
+					</div>
+					<div class="record-container">
+						<div class="chatMsg">
+							<div class="he-group">
+								<img class="head-img" src="images/mini-bg-01.png" />
+								<div class="msg">
+									<div class="baseInfo">貂蝉&nbsp;&nbsp;<time class="time">2017-02-04 12:02:05</time></div>
+									<div class="cont">
+										<pre class="cont">貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了</pre>
+									</div>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+							<div class="me-group">
+								<img class="head-img" src="images/mini-bg-02.png" />
+								<div class="msg">
+									<div class="baseInfo">貂蝉&nbsp;&nbsp;<time class="time">2017-02-04 12:02:
+							05</time></div>
+									<div class="cont">
+										<pre class="cont">貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了貂蝉发话了</pre>
+									</div>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+							<div class="he-group">
+								<img class="head-img" src="images/mini-bg-03.png" />
+								<div class="msg">
+									<div class="baseInfo">貂蝉&nbsp;&nbsp;<time class="time">2017-02-04 12:02:
+							05</time></div>
+									<div class="cont">
+										<img src="images/page-bg-01.jpg" />
+									</div>
+
+								</div>
+								<div class="clearfix"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="lib/jquery.min.js"></script>
+		<script src="lib/recorder.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<script src="lib/socket.io.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/myPhone.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script src="js/demo.js" type="text/javascript" charset="utf-8"></script>-->
+		<script type="text/javascript">
+			function answer() {
+				//接听
+				phone.answer();
+			}
+			function hangup() {
+				//挂断
+				phone.hangUp();
+			}
+		</script>
+
+	</body>
+
+</html>

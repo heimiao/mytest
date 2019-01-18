@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+		<title>接听电话</title>
+		<!-- Bootstrap -->
+		<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
+		<!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
+		<!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row dt-call">
+				<div class="col-xs-6 show-call-info">
+					<div class=""></div>
+					<!--<button class="btn btn-info getStream">获取音频流</button>-->
+					<button class="btn btn-success startRecord">开始录音</button>
+					<button class="btn btn-warning stopRecord">停止录音</button>
+					<!--	<button class="btn btn-success clearRecord">清除录音</button>-->
+					<button class="btn btn-success  playRecord">播放录音</button>
+					<h3>服务器发过来的所有东东</h3>
+					<div class="showImg">1231</div>
+					<h3>客户端发送的东东</h3>
+					<div class="showImg-clit">1231</div>
+					<textarea class="form-control send"></textarea>
+					<button class="btn btn-success  sendImg" onclick="sendImg()">发消息</button>
+					<button class="btn btn-success  sendImg" onclick="sendAudio()">发音频媒体</button>
+				</div>
+				<div class="col-xs-6 dt-call-record">
+					<h3>机器人和客户对话列表</h3>
+				</div>
+			</div>
+			<audio id="remoteAudio" autoplay="autoplay" controls="controls"></audio>
+			<audio id="myaudio" src="wss://192.168.29.100:8000" autoplay="autoplay" controls="controls"></audio>
+		</div>
+
+		<script src="lib/jquery.min.js"></script>
+		<!--<script src="lib/recorder.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="lib/my-recorder.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		<!--<script src="lib/socket.io.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			function onRecordStream(blob) {
+				console.log(blob.size);
+				//ws.send(blob);
+			}
+
+			function log(args) {
+				console.log(args);
+			}
+			
+
+			function startWs() {
+				if("WebSocket" in window) {
+					//var wsServer = 'wss://192.168.29.58:8443 /websocket/audio'; //服务器地址
+					var wsServer = 'wss://192.168.29.100:8000';
+					ws = new WebSocket(wsServer); //创建WebSocket对象 
+					console.log("websocket状态      " + ws.readyState); //查看websocket当前状态
+					ws.onopen = function(evt) {
+						ws.binaryType = "arraybuffer";
+						//已经建立连接
+						//websocket.send("hello"); //向服务器发送消息
+					};
+					ws.onclose = function(evt) {
+						//已经关闭连接
+						console.log(evt);
+					};
+					
+					ws.onmessage = function(evt) {
+						//收到服务器消息，使用evt.data提取
+						//console.log(evt);
+						/*if(typeof evt.data == "string") {
+							var test = document.createElement("div").innerHTML = evt.data;
+							$(".showImg").html(test)
+						} else {
+							//document.getElementById("remoteAudio").srcObject = evt.data;
+						}*/
+						console.log(evt);
+						//document.getElementById("myaudio").src= window.URL.createObjectURL(getBlob2(evt,evt.length));
+						//cacheBuffer(args)
+						//timedCount()
+					};
+					ws.onerror = function(evt) {
+						//产生异常
+						console.error(evt)
+					};
+				} else {
+					$.danger("不支持websocket建立，请更新更高版本的浏览器")
+				}
+			}
+
+			var init = 0;
+			var nextTime = 0;
+			var audioStack = [];
+			
+			function toArrayBuffer(buffer) {
+			    var ab = new ArrayBuffer(buffer.length);
+			    var view = new Uint8Array(ab);
+			    for (var i = 0; i < buffer.length; ++i) {
+			        view[i] = buffer[i];
+			    }
+			    return ab;
+			}	
+
+
+
+			var play_queue = new Array(20);
+			var index_play = 0;
+			var index_insert = 0; 
+			//缓存语音流
+			function cacheBuffer(blobs) {
+				 //var data = new Uint8Array(blobs);
+			 var reader = new FileReader();
+				reader.onload = function(evt)
+	            {
+	                if(evt.target.readyState == FileReader.DONE)
+	                {
+	                    var data = new Uint8Array(reader.result);
+	                    console.log(data);
+	                    audioStack.push(data);
+	                      if ((init!=0) || (audioStack.length > 100)) { // make sure we put at least 10 chunks in the buffer before starting
+							init++;
+							timedCount();
+					        }
+						                    
+	                   /* if(index_insert==20){
+	                        index_insert=0;
+	                    }
+	                    play_queue[index_insert]=data;
+	                    timedCount(reader.result)
+	                    //pcm2wav(data);
+	                    console.log("第"+index_insert+"包：");
+	                    index_insert++;*/
+	                }
+	            }  
+				reader.readAsArrayBuffer(blobs);
+			}
+
+			 
+			function timedCount() { 
+				
+				while (audioStack.length) {
+					var data     = toArrayBuffer(audioStack.shift());
+					var int16Arr = new Int16Array(data);
+					
+					var audio = [];
+			
+					for (var i = 0; i < int16Arr.length; i++) {
+						audio[i] = (int16Arr[i]>0)?int16Arr[i]/32767:int16Arr[i]/32768; 
+					}
+			
+					var source      = context.createBufferSource();
+					var audioBuffer = context.createBuffer(1, audio.length , 44100);
+					audioBuffer.getChannelData(0).set(audio);
+					source.buffer   = audioBuffer;
+					source.connect(context.destination);
+					if (nextTime == 0)
+						nextTime = context.currentTime + 0.05;  ///  tune this if you like
+					source.start(nextTime);
+					nextTime+=source.buffer.duration; 
+				};
+				
+				 /*var audio = new Float32Array(data);
+				    var source = context.createBufferSource();
+				    var audioBuffer = context.createBuffer(1, audio.length, 44100);
+				    audioBuffer.getChannelData(0).set(audio);
+				    // console.log(audioBuffer);
+				    source.buffer = audioBuffer;
+				    source.connect(context.destination);
+				    source.start(AudioStart);
+				    AudioStart += audioBuffer.duration;*/
+				    
+				/*if(play_queue[index_play]) {
+					if(index_play == 1000) index_play = 0;
+					console.log(play_queue[index_play]);
+					context.decodeAudioData(play_queue[index_play], function(buffer) {
+						//解码成pcm流
+						var audioBufferSouceNode = context.createBufferSource();
+						audioBufferSouceNode.buffer = buffer;
+						audioBufferSouceNode.connect(context.destination);
+						audioBufferSouceNode.start(0);
+					}, function(e) {
+						console.log("failed to decode the file");
+					});
+					//播放后清空
+					play_queue[index_play] = new ArrayBuffer(0);
+					index_play++;
+				}
+*/
+			}
+
+			var myAudio = document.getElementById("remoteAudio");
+			//startWs() 
+
+			function sendImg() {
+				var data = $(".send").val() || "默认数据"
+				var test = document.createElement("div").innerHTML = data;
+				$(".howImg-clit").append(test);
+				ws.send(data); //向服务器发送消息
+			}
+
+			function sendAudio() {
+				console.log("==发送流文件==");
+				//ws.send();
+			}
+
+			try {
+				// webkit shim
+				window.AudioContext = window.AudioContext || window.webkitAudioContext;
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+				window.URL = window.URL || window.webkitURL;
+				var audio_context = new AudioContext;
+			} catch(e) {
+				messages("您的浏览器不支持语音采集，请切换更高版本浏览器");
+			}
+
+			function getStream(calb) {
+				if(calb) {
+					navigator.mediaDevices.getUserMedia({
+						audio: true,
+						video: false,
+					}).then(function success(stream) {
+						window.mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[0];
+
+						/*var aInput = audio_context.createMediaStreamSource(stream); 
+						aInput.context.sampleRate = 16000;
+						recorder = new Recorder(aInput);*/
+
+						//手写音频转化
+						 var newrecord = new audioRecorder(stream); 
+						calb(newrecord) 
+					}).catch(function(err) {
+						console.error("获取本地媒体流错误" + err);
+					});
+				}
+			}
+
+			var rec = null;
+			getStream(function(args) {
+				rec = args;
+			});
+
+			//getStream();
+			function startRecord() {
+				console.log("开始录音");
+				rec.start();     
+				//recorder && recorder.record();
+			}
+
+			function playRecord() {
+				console.log("播放录音");
+				//				timedCount()
+				setInterval('timedCount()', 200);
+				/*console.log(rec.getBlob());
+				 */
+			}
+
+			function stopRecord() {
+				console.log("停止录音");
+				rec.clear();                
+				rec.stop();
+				//recorder && recorder.stop();
+			}
+
+			function clearRecord() {
+				console.log("清除录音");
+				stopRecord();
+				/*recorder && recorder.clear();*/
+			}
+
+			var getStreamBtn = $(".getStream");
+			var startRecordBtn = $(".startRecord");
+			var stopRecordBtn = $(".stopRecord");
+			var clearRecordBtn = $(".clearRecord");
+			var playRecordBtn = $(".playRecord");
+			getStreamBtn.click(e => {
+				getStream()
+			})
+			startRecordBtn.click(e => {
+				getStream()
+				startRecord()
+			})
+			stopRecordBtn.click(e => {
+				stopRecord()
+			})
+			clearRecordBtn.click(e => {
+				clearRecord()
+			})
+			playRecordBtn.click(e => {
+				playRecord();
+			})
+
+			var context = new AudioContext();   
+			function audioRecorder(stream) {    
+				config = {};     
+				config.sampleBits = config.smapleBits || 16;    
+				config.sampleRate = config.sampleRate || (44100 / 6);     
+				var audioInput = context.createMediaStreamSource(stream);    
+				audioInput.context.sampleRate = 16000;
+				var recorders = context.createScriptProcessor(256, 1, 1);     
+				var audioData = {        
+					size: 0, //录音文件长度
+					buffer: [], //录音缓存	
+					inputSampleRate: 48000, // context.sampleRate, //输入采样率		
+					inputSampleBits: 16, //输入采样数位 8, 16		
+					outputSampleRate: 8000, // config.sampleRate, //输出采样率			
+					oututSampleBits: config.sampleBits,
+
+					  //输出采样数位 8, 16		
+					clear: function() {            
+						this.buffer = [];            
+						this.size = 0;        
+					},
+					input: function(data) {            
+						this.buffer.push(new Float32Array(data));            
+						this.size += data.length;  
+					},
+					compress: function() { //合并压缩//合并 
+						var data = new Float32Array(this.size);            
+						var offset = 0;            
+						for(var i = 0; i < this.buffer.length; i++) {                
+							data.set(this.buffer[i], offset);                
+							offset += this.buffer[i].length;            
+						}
+						//压缩
+						var compression = parseInt(this.inputSampleRate / this.outputSampleRate);            
+						var length = data.length / compression;            
+						var result = new Float32Array(length);            
+						var index = 0,
+							j = 0;            
+						while(index < length) {                
+							result[index] = data[j];                
+							j += compression;                
+							index++;            
+						}         
+						return result;      
+					},
+					encodeWAV: function() {            
+						var sampleRate = Math.min(this.inputSampleRate, this.outputSampleRate);            
+						var sampleBits = 16; // Math.min(this.inputSampleBits, this.oututSampleBits);            
+						var bytes = this.compress();  
+						var dataLength = bytes.length * (sampleBits / 8) * 2;            
+						var buffer = new ArrayBuffer(dataLength); 
+						//var buffer = new ArrayBuffer(44 + dataLength);                   
+						var data = new DataView(buffer);             
+						var channelCount = 1; //单声道
+						var offset = 0;             
+						var writeString = function(str) {                
+							for(var i = 0; i < str.length; i++) {                    
+								data.setUint8(offset + i, str.charCodeAt(i));                
+							}            
+						};                    
+						/*//资源交换文件标识符
+						writeString('RIFF');
+						offset += 4;
+						// 下个地址开始到文件尾总字节数,即文件大小-8
+						data.setUint32(offset, 36 + dataLength, true);
+						offset += 4;
+						// WAV文件标志
+						writeString('WAVE');
+						offset += 4;
+						// 波形格式标志
+						writeString('fmt');
+						offset += 4;
+						// 过滤字节,一般为 0x10 = 16
+						data.setUint32(offset, 16, true);
+						offset += 4;
+						// 格式类别 (PCM形式采样数据)
+						data.setUint16(offset, 1, true);
+						offset += 2;
+						// 通道数
+						data.setUint16(offset, channelCount, true);
+						offset += 2;
+						// 采样率,每秒样本数,表示每个通道的播放速度
+						data.setUint32(offset, sampleRate, true);
+						offset += 4;
+						// 波形数据传输率 (每秒平均字节数) 单声道×每秒数据位数×每样本数据位/8
+						data.setUint32(offset, channelCount * sampleRate * (sampleBits / 8), true);
+						offset += 4;
+						// 快数据调整数 采样一次占用字节数 单声道×每样本的数据位数/8
+						data.setUint16(offset, channelCount * (sampleBits / 8), true);
+						offset += 2;
+						// 每样本数据位数
+						data.setUint16(offset, sampleBits, true);
+						offset += 2;
+						// 数据标识符
+						writeString('data');
+						offset += 4;
+						// 采样数据总数,即数据总大小-44
+						data.setUint32(offset, dataLength, true);
+						offset += 4;*/
+						// 写入采样数据
+						if(sampleBits === 8) {                
+							for(var i = 0; i < bytes.length; i++, offset++) {                    
+								var s = Math.max(-1, Math.min(1, bytes[i]));                    
+								var val = s < 0 ? s * 0x8000 : s * 0x7FFF;                    
+								val = parseInt(255 / (65535 / (val + 32768)));                    
+								data.setInt8(offset, val, true);                
+							}            
+						} else {                
+							for(var i = 0; i < bytes.length; i++, offset += 2) {                    
+								var s = Math.max(-1, Math.min(1, bytes[i]));                    
+								data.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);                
+							}            
+						}   
+						return new Blob([data], {
+							type: 'audio/wav'
+						});        
+					}    
+				}; 
+
+				this.start = function() {        
+					//把麦克风的输入和音频采集相连起来 
+					//context.destination返回代表在环境中的音频的最终目的地。
+					audioInput.connect(recorders);        
+					recorders.connect(context.destination);    
+				}     
+				this.stop = function() {        
+					recorders.disconnect();    
+				}     
+				this.getBlob = function() {        
+					return audioData.encodeWAV();    
+				}     
+				this.clear = function() {        
+					audioData.clear();    
+				}
+				recorders.onaudioprocess = function(e) {  
+					audioData.input(e.inputBuffer.getChannelData(0));  
+					sendArrayBuffer(audioData.encodeWAV())
+					audioData.clear();    
+				}
+			}; 
+			
+			
+			window.URL = window.URL || window.webkitURL;
+			window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+			/*if(!window.MediaSource) {
+				alert('MediaSource API is not available!');
+				return;
+			}*/
+			var mediaSource = new MediaSource;
+			myAudio.src = window.URL.createObjectURL(mediaSource);
+			
+			function sendArrayBuffer(args) {
+				//ws.binaryData = "arrayBuffer";
+				var reader = new FileReader(); 
+				reader.addEventListener("loadend", function(evt) {
+					var buf = new Uint8Array(reader.result);
+					if(reader.result.byteLength > 0) {
+						//加这个判断，是因为有很多数据是空的，这个没有必要发到后台服务器，减轻网络开销，提升性能吧。
+						//console.log(buf);
+						/*mediaSource.addEventListener('updatestart', function(e) {
+							console.log(buf);
+							var sourceBuffer = mediaSource.addSourceBuffer('audio/wav');
+							 sourceBuffer.append(buf);
+						});*/
+						//ws.send(buf);
+					}
+				});
+				
+				cacheBuffer(args)
+				reader.readAsArrayBuffer(args);
+			}
+			
+			function pcm2wav(pcm_byte) {
+				var sampleRate = 8000; //采样率
+				var sampleBits = 16; //采样位数
+				var dataLength = pcm_byte.length;
+				var buffer = new ArrayBuffer(dataLength);
+//				var buffer = new ArrayBuffer(44 + dataLength);
+				var data = new DataView(buffer); //可使用 DataView 对象在 ArrayBuffer 中的任何位置读取和写入不同类型的二进制数据。
+				var channelCount = 1; //单声道
+				var offset = 0;
+				var writeString = function(str) {
+					for(var i = 0; i < str.length; i++) {
+						data.setUint8(offset + i, str.charCodeAt(i));
+					}
+				}; // 资源交换文件标识符
+			/*	writeString('RIFF');
+				offset += 4;
+				// 下个地址开始到文件尾总字节数,即文件大小-8
+				data.setUint32(offset, 36 + dataLength, true);
+				offset += 4;
+				// WAV文件标志
+				writeString('WAVE');
+				offset += 4;
+				// 波形格式标志
+				writeString('fmt ');
+				offset += 4;
+				// 过滤字节,一般为 0x10 = 16
+				data.setUint32(offset, 16, true);
+				offset += 4;
+				// 格式类别 (PCM形式采样数据)
+				data.setUint16(offset, 1, true);
+				offset += 2;
+				// 通道数
+				data.setUint16(offset, channelCount, true);
+				offset += 2;
+				// 采样率,每秒样本数,表示每个通道的播放速度
+				data.setUint32(offset, sampleRate, true);
+				offset += 4;
+				// 波形数据传输率 (每秒平均字节数) 单声道×每秒数据位数×每样本数据位/8
+				data.setUint32(offset, channelCount * sampleRate * (sampleBits / 8), true);
+				offset += 4;
+				// 快数据调整数 采样一次占用字节数 单声道×每样本的数据位数/8
+				data.setUint16(offset, channelCount * (sampleBits / 8), true);
+				offset += 2;
+				// 每样本数据位数
+				data.setUint16(offset, sampleBits, true);
+				offset += 2;
+				// 数据标识符
+				writeString('data');
+				offset += 4;
+				// 采样数据总数,即数据总大小-44
+				data.setUint32(offset, dataLength, true);
+				offset += 4;*/
+				//数据位
+				for(var i = 0; i < pcm_byte.length; i++, offset++) {
+					data.setUint8(offset, pcm_byte[i]);
+				}
+				// 写入采样数据
+				//        if (sampleBits === 8) {
+				//            for (var i = 0; i < bytes.length; i++, offset++) {
+				//                var s = Math.max(-1, Math.min(1, bytes[i]));
+				//                var val = s < 0 ? s * 0x8000 : s * 0x7FFF;
+				//                val = parseInt(255 / (65535 / (val + 32768)));
+				//                data.setInt8(offset, val, true);
+				//            }
+				//        } else {
+				//            for (var i = 0; i < bytes.length; i++, offset += 2) {
+				//                var s = Math.max(-1, Math.min(1, bytes[i]));
+				//                data.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+				//            }
+				//        }
+				return buffer;
+				//return new Blob([data], { type: 'audio/wav' });
+			}
+		
+		
+		</script>
+	</body>
+
+</html>
