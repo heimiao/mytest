@@ -15,28 +15,26 @@
       <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
     <![endif]-->
-		<link rel="stylesheet" type="text/css" href="css/index_sass.css" />
+		<link rel="stylesheet" type="text/css" href="stylesheets/index_sass.css" />
 	</head>
 
 	<body>
-		<div class="login">
-			<img src="images/logo-4.png" />
-		</div>
-
 		<div class="my-container">
 			<div class="phone-title"></div>
 			<div class="flex-parent dt-call">
 				<div class="flex-child call-info">
 					<audio id="remoteAudio" autoplay="autoplay" controls="controls"></audio>
-					<div class=""><img src="images/logo.png" /></div>
 					<div>
-						<button class="btn btn-info getStream">获取音频流</button>
+						<!--<div class=""><img src="images/logo.png" /></div>-->
+						<!--<button class="btn btn-info getStream">获取音频流</button>
 						<button class="btn btn-success startRecord">开始录音</button>
 						<button class="btn btn-warning stopRecord">停止录音</button>
 						<button class="btn btn-success clearRecord">清除录音</button>
 						<button class="btn btn-success  playRecord">播放录音</button>
 						<button class="btn btn-success" onclick="answer()">接听</button>
-						<button class="btn btn-success" onclick="hangup()">挂断</button>
+						<button class="btn btn-success" onclick="hangup()">挂断</button>-->
+						<textarea id="textCont" rows="3" cols="100%" class="form-control"></textarea>
+						<button class="btn btn-success sendInfo">发送</button>
 					</div>
 				</div>
 				<div class="flex-child call-record">
@@ -45,7 +43,7 @@
 					</div>
 					<div class="record-container">
 						<div class="chatMsg">
-							<div class="he-group">
+							<!--	<div class="he-group">
 								<img class="head-img" src="images/mini-bg-01.png" />
 								<div class="msg">
 									<div class="baseInfo">貂蝉&nbsp;&nbsp;<time class="time">2017-02-04 12:02:05</time></div>
@@ -74,34 +72,151 @@
 									<div class="cont">
 										<img src="images/page-bg-01.jpg" />
 									</div>
-
 								</div>
 								<div class="clearfix"></div>
-							</div>
+							</div>-->
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
 		<script src="lib/jquery.min.js"></script>
-		<script src="lib/recorder.js" type="text/javascript" charset="utf-8"></script>
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
-		<script src="lib/socket.io.js" type="text/javascript" charset="utf-8"></script>
-		<script src="lib/jquery.dialog.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/myPhone.js" type="text/javascript" charset="utf-8"></script>
-		<!--<script src="js/demo.js" type="text/javascript" charset="utf-8"></script>-->
 		<script type="text/javascript">
-			function answer() {
-				//接听
-				phone.answer();
-			}
-			function hangup() {
-				//挂断
-				phone.hangUp();
-			}
-		</script>
+			var wsurl = "wss://192.168.170.80:3000"
+			var ws = null;
 
+			function createWs() {
+				var url = wsurl;
+
+				if('WebSocket' in window) {
+					ws = new WebSocket(url, window.location.search.split("=")[1] || 1000);
+				} else if('MozWebSocket' in window) {
+					ws = new MozWebSocket(url);
+				} else {
+					console.log("您的浏览器不支持WebSocket。");
+					return;
+				}
+			}
+
+			function init() {
+				if(ws != null) {
+					console.log("现已连接");
+					return;
+				}
+				createWs();
+				ws.onopen = function() {
+					//设置发信息送类型为：ArrayBuffer  
+					console.log("现已连接");
+				}
+				ws.onmessage = function(e) {
+					console.log(e.data.toString());
+					//将接受过来的spd放入pc实例
+					/*pc.setRemoteDescription(new RTCSessionDescription(e.data.sdp), function() {
+						if(pc.remoteDescription.type == 'offer')
+							pc.createAnswer(function(desc) {
+								pc.setLocalDescription(desc, function() {
+									//signalingChannel.send(JSON.stringify({'sdp': pc.localDescription}));
+									//传递给对方
+								}, ee => console.log(ee));
+							}, ex => console.log(ex));
+
+					});*/
+				}
+				ws.onclose = function(e) {
+					console.log("onclose: closed", e);
+					ws = null;
+					createWs(); //防止连接断开。
+				}
+				ws.onerror = function(e) {
+					console.log("onerror: error", e);
+					ws = null;
+					createWs(); //同上面的解释
+				}
+			}
+			init();
+
+			var constraints = {
+					audio: true,
+					video: false,
+				},
+				remoteAudio = document.getElementById("remoteAudio"),
+				iceServers = [{
+					url: 'stun.ekiga.net'
+				}, {
+					url: 'stun.ideasip.com'
+				}, {
+					url: 'stun.voiparound.com'
+				}],
+				pc = null,
+				mediaConstraints = {
+					mandatory: {
+						OfferToReceiveAudio: true,
+						OfferToReceiveVideo: true
+					}
+				};
+
+			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+			function getMedia() {
+				navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
+					//remoteAudio.srcObject = stream;
+					//创建RTCPeerConnection
+					createPc(stream);
+				}).catch(function(error) {
+					console.error({
+						name: error.name,
+						message: error.message
+					});
+				});
+			}
+			getMedia();
+
+			//var signalingChannel = new SignalingChannel();
+
+			//创建连接
+			function createPc(stream) {
+				pc = new RTCPeerConnection(iceServers);
+
+				pc.onicecandidate = function(evt) {
+					//穿透的回调
+					if(evt.candidate) {
+						/*signalingChannel.send(JSON.stringify({
+							'candidate': evt.candidate
+						}));*/
+					}
+				}
+				
+				pc.onnegotiationneeded = function() {
+					//穿透之后回调
+					console.log("onnegotiationneeded");
+				}
+
+				//创建offer邀约
+				//将offer添加pc实例
+				//将获取的信令通过字符串发送给对等端
+				pc.createOffer(function(desc) {
+					pc.setLocalDescription(desc, function() {
+						/*signalingChannel.send(JSON.stringify({
+							'sdp': pc.localDescription
+						}));*/
+
+					}, err => console.log(err));
+
+				}, err => console.log(err));
+
+				/*pc.addStream = function(evt) {
+					//远程流到达后，将其显示在远程视频元素中
+					remoteView.src = URL.createObjectURL(evt.stream);
+				};
+				pc.addStream(stream);*/
+			}
+
+			$(".sendInfo").click(function() {
+				ws.send($("#textCont").val())
+				$("#textCont").val("");
+			})
+		</script>
 	</body>
 
 </html>
