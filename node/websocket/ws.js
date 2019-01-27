@@ -1,31 +1,41 @@
 var websw = require('ws');
 var fs = require('fs');
-var ws = null,
+var wss = null,
 	webskt = null;
 var createWs = function(server) {
-	ws = new websw.Server({
+	wss = new websw.Server({
 		server: server,
 		//		verifyClient: false,
 	});
 	var sktList = null;
-	ws.on('connection', function(webskt,req) {
-		console.log("====客户端===");
-		console.log(webskt.clients);
-		console.log("====请求对象===");
-		console.log(req);
-		//sktList[webskt.protocol] = webskt;
-		
+	
+	function sendImg(msg){
+		console.log("====链接对象===");
+		//console.log(wss.clients.set)
+		console.log("====ws对象===");
+		//console.log(webskt.WebSocket.protocol)
+		var data=JSON.parse(msg);
+		 wss.clients.forEach(function each(client) { 
+		 	if (client.readyState === websw.OPEN&&client.protocol==data.target) {
+		 		console.log(client)
+		        client.send(JSON.stringify(data));
+		     } 
+		 });
+	}
+	
+	
+	wss.on('connection', function(webskt,req) {  
 		webskt.on('message', message);
 		webskt.on('error', error)
 		webskt.on('close', close)
-		webskt.on('open', open)
-
+		webskt.on('open', open)  
 	})
 
 	function message(msg) {
 		console.log("收到消息就给前端");
 		console.log(msg);
-		this.send(msg)
+		//this.send(msg)
+		sendImg(msg)
 	}
 
 	function error(msg) {

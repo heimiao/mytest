@@ -23,6 +23,14 @@
 			<div class="phone-title"></div>
 			<div class="flex-parent dt-call">
 				<div class="flex-child call-info">
+					<h3>本地视频</h3>
+					<video id="localVideo" width="100%" autoplay="autoplay"> 
+						当前浏览器不支持 video直接播放，点击这里下载视频： <a href="myvideo.webm">下载视频</a>
+					</video>
+					<h3>远程视频</h3>
+					<video id="remoteVideo" width="100%" autoplay="autoplay"> 
+						当前浏览器不支持 video直接播放，点击这里下载视频： <a href="myvideo.webm">下载视频</a>
+					</video>
 					<audio id="remoteAudio" autoplay="autoplay" controls="controls"></audio>
 					<div>
 						<!--<div class=""><img src="images/logo.png" /></div>-->
@@ -33,6 +41,7 @@
 						<button class="btn btn-success  playRecord">播放录音</button>
 						<button class="btn btn-success" onclick="answer()">接听</button>
 						<button class="btn btn-success" onclick="hangup()">挂断</button>-->
+						<input type="text" id="target" class="form-control" placeholder="发送目标"  value="1000"/>
 						<textarea id="textCont" rows="3" cols="100%" class="form-control"></textarea>
 						<button class="btn btn-success sendInfo">发送</button>
 					</div>
@@ -83,7 +92,7 @@
 		<script src="lib/jquery.min.js"></script>
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
-			var wsurl = "wss://192.168.170.80:3000"
+			var wsurl = "wss://192.168.0.102:3000"
 			var ws = null;
 
 			function createWs() {
@@ -109,19 +118,32 @@
 					//设置发信息送类型为：ArrayBuffer  
 					console.log("现已连接");
 				}
-				ws.onmessage = function(e) {
-					console.log(e.data.toString());
+				ws.onmessage = function(e) { 
+					var reciveData=JSON.parse(e.data); 
+					console.log(reciveData); 
+					var newEl=document.createElement("div"); 
+					newEl.innerHTML=reciveData.send.context
+					document.querySelector(".chatMsg").appendChild(newEl)
+					
 					//将接受过来的spd放入pc实例
-					/*pc.setRemoteDescription(new RTCSessionDescription(e.data.sdp), function() {
+					  pc.setRemoteDescription(new RTCSessionDescription(reciveData.send.sdp), function() {
 						if(pc.remoteDescription.type == 'offer')
 							pc.createAnswer(function(desc) {
 								pc.setLocalDescription(desc, function() {
+									obj.target=1001;
+									obj.send.sdp=pc.localDescription;
+									ws.send(JSON.stringify(obj));
 									//signalingChannel.send(JSON.stringify({'sdp': pc.localDescription}));
 									//传递给对方
+									
 								}, ee => console.log(ee));
 							}, ex => console.log(ex));
 
-					});*/
+					});  
+					
+					if(obj.send.candidate){ 
+				      pc.addIceCandidate(obj.send.candidate); 
+				    } 
 				}
 				ws.onclose = function(e) {
 					console.log("onclose: closed", e);
@@ -135,12 +157,24 @@
 				}
 			}
 			init();
-
+			var obj={
+					target:document.getElementById("target").value||1000,
+					send:{
+						context:$("#textCont").val(),
+						sdp:''
+					}
+				}
+			$(".sendInfo").click(function() { 
+				ws.send(JSON.stringify(obj))
+				$("#textCont").val("");
+			})
+			
 			var constraints = {
 					audio: true,
-					video: false,
+					video: true,
 				},
 				remoteAudio = document.getElementById("remoteAudio"),
+				remoteView = document.getElementById("remoteView"),
 				iceServers = [{
 					url: 'stun.ekiga.net'
 				}, {
@@ -161,6 +195,7 @@
 			function getMedia() {
 				navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
 					//remoteAudio.srcObject = stream;
+					document.getElementById("localVideo").srcObject=stream;
 					//创建RTCPeerConnection
 					createPc(stream);
 				}).catch(function(error) {
@@ -171,16 +206,19 @@
 				});
 			}
 			getMedia();
-
+				
 			//var signalingChannel = new SignalingChannel();
-
+			pc = new RTCPeerConnection(iceServers);
 			//创建连接
-			function createPc(stream) {
-				pc = new RTCPeerConnection(iceServers);
-
+			function createPc(streams) {
+				pc.addStream(streams);
 				pc.onicecandidate = function(evt) {
 					//穿透的回调
+					//console.log("==候选机器====",evt);
 					if(evt.candidate) {
+						console.log(evt.candidate);
+						obj.send.candidate=evt.candidate; 
+						ws.send(JSON.stringify(obj));
 						/*signalingChannel.send(JSON.stringify({
 							'candidate': evt.candidate
 						}));*/
@@ -197,25 +235,23 @@
 				//将获取的信令通过字符串发送给对等端
 				pc.createOffer(function(desc) {
 					pc.setLocalDescription(desc, function() {
+						obj.send.sdp=pc.localDescription; 
+						ws.send(JSON.stringify(obj));
 						/*signalingChannel.send(JSON.stringify({
 							'sdp': pc.localDescription
 						}));*/
-
 					}, err => console.log(err));
 
 				}, err => console.log(err));
 
-				/*pc.addStream = function(evt) {
+				 pc.addStream = function(evt) {
 					//远程流到达后，将其显示在远程视频元素中
 					remoteView.src = URL.createObjectURL(evt.stream);
-				};
-				pc.addStream(stream);*/
+				}; 
+ 
+				
 			}
-
-			$(".sendInfo").click(function() {
-				ws.send($("#textCont").val())
-				$("#textCont").val("");
-			})
+		
 		</script>
 	</body>
 

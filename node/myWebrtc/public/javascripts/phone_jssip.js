@@ -1,4 +1,4 @@
-var baseUrl="192.168.170.7"
+var baseUrl="192.168.0.102"
 //var baseUrl="172.20.10.5"
 var phone = (function() {
 	function Phone() {
@@ -7,8 +7,9 @@ var phone = (function() {
 			//serverUrl: "123.58.240.201:5060",8817879518517
 			uri: "sip:1000@"+baseUrl+":5060",
 			pwd: "1234",
-			wssUrl: new JsSIP.WebSocketInterface('wss://'+baseUrl+':7443'),
+			wssUrl: new JsSIP.WebSocketInterface('wss://'+baseUrl+':7443'),//7443
 			remoteNum: "sip:1001@"+baseUrl+":5060",
+			trace:true,
 		}
 		this.constraints = {
 			audio: true,
